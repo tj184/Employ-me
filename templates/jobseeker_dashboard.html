@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">My Profile</h2>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <!-- Name Section -->
+                    <h5>Name</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.first_name.label }}
+                            {% if form.first_name.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.first_name(class="form-control") }}
+                            {% for err in form.first_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.middle_name.label }}
+                            {{ form.middle_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.last_name.label }}
+                            {% if form.last_name.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.last_name(class="form-control") }}
+                            {% for err in form.last_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Personal Details -->
+                    <h5>Personal Details</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.dob.label }}
+                            {% if form.dob.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.dob(class="form-control", type="date") }}
+                            {% for err in form.dob.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.gender.label }}
+                            {% if form.gender.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.gender(class="form-select") }}
+                            {% for err in form.gender.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.city.label }}
+                            {% if form.city.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.city(class="form-control") }}
+                            {% for err in form.city.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.state.label }}
+                            {% if form.state.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.state(class="form-control") }}
+                            {% for err in form.state.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.address.label }}
+                        {% if form.address.flags.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ form.address(class="form-control", rows=3) }}
+                        {% for err in form.address.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.pincode.label }}
+                            {% if form.pincode.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.pincode(class="form-control") }}
+                            {% for err in form.pincode.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.mobile.label }}
+                            {% if form.mobile.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.mobile(class="form-control") }}
+                            {% for err in form.mobile.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.father_husband_name.label }}
+                        {% if form.father_husband_name.flags.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ form.father_husband_name(class="form-control") }}
+                        {% for err in form.father_husband_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                    </div>
+
+                    <!-- Education -->
+                    <h5>Education</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.education_level.label }}
+                            {% if form.education_level.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.education_level(class="form-select", id="education_level") }}
+                            {% for err in form.education_level.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3" id="education_other_group" style="display:none;">
+                            {{ form.education_other.label }}
+                            {{ form.education_other(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <!-- Work Preferences -->
+                    <h5>Work Preferences</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.preferred_location1.label }}
+                            {% if form.preferred_location1.flags.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ form.preferred_location1(class="form-control", list="cities") }}
+                            {% for err in form.preferred_location1.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.preferred_location2.label }}
+                            {{ form.preferred_location2(class="form-control", list="cities") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.preferred_location3.label }}
+                            {{ form.preferred_location3(class="form-control", list="cities") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.employment_type.label }}
+                        {% if form.employment_type.flags.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ form.employment_type(class="form-select") }}
+                        {% for err in form.employment_type.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                    </div>
+
+                    <!-- Skills -->
+                    <h5>Skills</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Select Skills (check all that apply)</label>
+                        <div class="row">
+                            {% for subfield in form.selected_skills %}
+                            <div class="col-md-4 col-sm-6">
+                                <div class="form-check">
+                                    {{ subfield(class="form-check-input") }}
+                                    {{ subfield.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.custom_skills.label }}
+                        {{ form.custom_skills(class="form-control", placeholder="e.g., Cooking, Driving") }}
+                    </div>
+
+                    <!-- Images -->
+                    <h5>Images</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.profile_pic.label }}
+                            {{ form.profile_pic(class="form-control") }}
+                            {% if profile and profile.profile_pic %}
+                                <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" class="img-thumbnail mt-2" width="150">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.aadhar_card.label }}
+                            {{ form.aadhar_card(class="form-control") }}
+                            {% if profile and profile.aadhar_card %}
+                                <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" class="img-thumbnail mt-2" width="150">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Preview -->
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5>Profile Preview</h5>
+                <hr>
+                {% if profile %}
+                <p><strong>Name:</strong> {{ profile.first_name }} {{ profile.middle_name or '' }} {{ profile.last_name }}</p>
+                <p><strong>City:</strong> {{ profile.city or 'N/A' }}</p>
+                <p><strong>State:</strong> {{ profile.state or 'N/A' }}</p>
+                <p><strong>Location 1:</strong> {{ profile.preferred_location1 }}</p>
+                <p><strong>Education:</strong> {{ profile.education_level }}{% if profile.education_other %} - {{ profile.education_other }}{% endif %}</p>
+                <p><strong>Employment:</strong> {{ profile.employment_type }}</p>
+                {% else %}
+                <p class="text-muted">Profile not completed yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Datalist for city autocomplete -->
+<datalist id="cities">
+    {% for city in cities %}
+    <option value="{{ city }}">
+    {% endfor %}
+</datalist>
+
+<script>
+// Toggle education 'Other' field
+document.addEventListener('DOMContentLoaded', function() {
+    const eduSelect = document.getElementById('education_level');
+    const otherGroup = document.getElementById('education_other_group');
+    function toggleOther() {
+        if (eduSelect.value === 'Others') {
+            otherGroup.style.display = 'block';
+        } else {
+            otherGroup.style.display = 'none';
+            document.getElementById('{{ form.education_other.id }}').value = '';
+        }
+    }
+    eduSelect.addEventListener('change', toggleOther);
+    toggleOther();  // initial state
+});
+</script>
+{% endblock %}

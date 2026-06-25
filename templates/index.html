@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero-section text-center">
+    <h1 class="display-3 fw-bold text-white">Welcome to Employ-me</h1>
+    <p class="lead text-white-50 mb-5">Connecting talent with opportunity.</p>
+    <div class="d-flex justify-content-center gap-4 flex-wrap">
+        <a href="{{ url_for('jobseeker_dashboard') if current_user.is_authenticated and current_user.role == 'jobseeker' else url_for('signup', role='jobseeker') }}" class="btn btn-primary btn-lg px-5 py-3">I'm a Jobseeker</a>
+        <a href="{{ url_for('hire_dashboard') if current_user.is_authenticated and current_user.role == 'employer' else url_for('signup', role='employer') }}" class="btn btn-success btn-lg px-5 py-3">I want to Hire</a>
+    </div>
+</div>
+<div class="row mt-5 g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow h-100">
+            <div class="card-body text-center">
+                <div class="icon-circle">👤</div>
+                <h5 class="card-title">Create Your Profile</h5>
+                <p class="card-text">Showcase your skills and experience with a complete profile.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow h-100">
+            <div class="card-body text-center">
+                <div class="icon-circle">📸</div>
+                <h5 class="card-title">Upload Images</h5>
+                <p class="card-text">Add a professional photo and your resume/certificates.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow h-100">
+            <div class="card-body text-center">
+                <div class="icon-circle">🤝</div>
+                <h5 class="card-title">Get Hired</h5>
+                <p class="card-text">Employers browse and connect with top candidates.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

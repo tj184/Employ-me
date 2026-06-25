@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4">Create Account</h3>
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control", placeholder="John Doe") }}
+                        {% for error in form.name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control", placeholder="you@example.com") }}
+                        {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control", placeholder="Min 8 characters", id="password") }}
+                            <!-- Strength bar -->
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small id="password-strength-text" class="form-text"></small>
+                            {% for error in form.password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {{ form.confirm_password(class="form-control", placeholder="Repeat password") }}
+                            {% for error in form.confirm_password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.role.label(class="form-label") }}
+                        {{ form.role(class="form-select") }}
+                    </div>
+                    {{ form.submit(class="btn btn-success w-100") }}
+                </form>
+                <p class="mt-3 text-center">Already have an account? <a href="{{ url_for('login') }}">Login</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+
+    function calculateStrength(password) {
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        return score;
+    }
+
+    function updateStrengthIndicator(score) {
+        let percent = 0;
+        let color = '';
+        let text = '';
+        // score 0-2: weak (red), 3-4: medium (yellow), 5: strong (green)
+        if (score <= 2) {
+            percent = (score / 5) * 100;
+            color = '#dc3545';  // red
+            text = 'Weak';
+        } else if (score <= 4) {
+            percent = (score / 5) * 100;
+            color = '#ffc107';  // yellow
+            text = 'Medium';
+        } else {
+            percent = 100;
+            color = '#198754';  // green
+            text = 'Strong';
+        }
+        strengthBar.style.width = percent + '%';
+        strengthBar.style.backgroundColor = color;
+        strengthText.textContent = text;
+        strengthText.style.color = color;
+    }
+
+    passwordInput.addEventListener('keyup', function() {
+        const pwd = passwordInput.value;
+        const score = calculateStrength(pwd);
+        updateStrengthIndicator(score);
+    });
+});
+</script>
+{% endblock %}

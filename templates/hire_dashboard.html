@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Available Candidates</h2>
+<div class="row">
+    {% for p in profiles %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow h-100">
+            {% if p.profile_pic %}
+            <img src="{{ url_for('static', filename='uploads/' + p.profile_pic) }}" class="card-img-top" style="height:200px; object-fit:cover;">
+            {% else %}
+            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height:200px;">No Image</div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ p.first_name }} {{ p.last_name }}</h5>
+                <p><strong>Education:</strong> {{ p.education_level }}{% if p.education_other %} - {{ p.education_other }}{% endif %}</p>
+                <p><strong>Location:</strong> {{ p.preferred_location1 }}</p>
+                <p><strong>Skills:</strong> {{ p.skills[:80] if p.skills else 'N/A' }}...</p>
+                <a href="{{ url_for('view_profile', profile_id=p.id) }}" class="btn btn-outline-primary btn-sm">View Full Profile</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12"><div class="alert alert-info">No jobseeker profiles yet.</div></div>
+    {% endfor %}
+</div>
+{% endblock %}

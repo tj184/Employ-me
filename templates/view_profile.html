@@ -1,0 +1,74 @@
+={% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="card shadow">
+        <div class="row g-0">
+            <!-- Profile Picture -->
+            <div class="col-md-4 text-center p-3">
+                {% if profile.profile_pic %}
+                    <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" 
+                         class="img-fluid rounded" alt="Profile Picture" style="max-height: 300px;">
+                {% else %}
+                    <img src="{{ url_for('static', filename='default-avatar.png') }}" 
+                         class="img-fluid rounded" alt="No photo" style="max-height: 300px;">
+                {% endif %}
+            </div>
+
+            <!-- Profile Details -->
+            <div class="col-md-8">
+                <div class="card-body">
+                    <!-- Full Name -->
+                    <h2 class="card-title">
+                        {{ profile.first_name }} 
+                        {{ profile.middle_name or '' }} 
+                        {{ profile.last_name }}
+                    </h2>
+
+                    <!-- Contact & Basic Info -->
+                    <p class="text-muted">
+                        <strong>Email:</strong> {{ profile.user.email }}<br>
+                        <strong>Mobile:</strong> {{ profile.mobile }}<br>
+                        <strong>Date of Birth:</strong> {{ profile.dob.strftime('%d-%b-%Y') if profile.dob else 'N/A' }}<br>
+                        <strong>Gender:</strong> {{ profile.gender }}
+                    </p>
+                    <hr>
+
+                    <!-- Address -->
+                    <h5>📍 Address</h5>
+                    <p>{{ profile.address or 'Not provided' }}</p>
+                    <p><strong>City:</strong> {{ profile.city or 'N/A' }} &nbsp;|&nbsp; <strong>State:</strong> {{ profile.state or 'N/A' }} &nbsp;|&nbsp; <strong>Pincode:</strong> {{ profile.pincode or 'N/A' }}</p>
+
+                    <!-- Father/Husband -->
+                    <h5>👤 Father's / Husband's Name</h5>
+                    <p>{{ profile.father_husband_name or 'Not provided' }}</p>
+
+                    <!-- Education -->
+                    <h5>🎓 Education</h5>
+                    <p>{{ profile.education_level }}</p>
+                    {% if profile.education_other %}
+                        <p><strong>Other:</strong> {{ profile.education_other }}</p>
+                    {% endif %}
+
+                    <!-- Work Preferences -->
+                    <h5>💼 Work Preferences</h5>
+                    <p><strong>Employment Type:</strong> {{ profile.employment_type }}</p>
+                    <p><strong>Preferred Location 1:</strong> {{ profile.preferred_location1 }}</p>
+                    {% if profile.preferred_location2 %}
+                        <p><strong>Preferred Location 2:</strong> {{ profile.preferred_location2 }}</p>
+                    {% endif %}
+                    {% if profile.preferred_location3 %}
+                        <p><strong>Preferred Location 3:</strong> {{ profile.preferred_location3 }}</p>
+                    {% endif %}
+
+                    <!-- Skills -->
+                    <h5>🛠️ Skills</h5>
+                    <p>{{ profile.skills or 'No skills listed' }}</p>
+
+                    <!-- Back Button -->
+                    <a href="{{ url_for('hire_dashboard') }}" class="btn btn-secondary mt-3">⬅ Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
