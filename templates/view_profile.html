@@ -1,74 +1,97 @@
-={% extends "base.html" %}
+{% extends "base.html" %}
+
 {% block content %}
-<div class="container">
-    <div class="card shadow">
+<div class="container mt-4">
+    <div class="card-modern p-0 overflow-hidden">
         <div class="row g-0">
-            <!-- Profile Picture -->
-            <div class="col-md-4 text-center p-3">
+            <!-- Profile Picture (left on desktop, top on mobile) -->
+            <div class="col-md-4 p-4 d-flex align-items-center justify-content-center"
+                 style="background: rgba(168, 85, 247, 0.05); border-right: 1px solid rgba(255,255,255,0.04);">
                 {% if profile.profile_pic %}
-                    <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" 
-                         class="img-fluid rounded" alt="Profile Picture" style="max-height: 300px;">
+                    <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}"
+                         alt="Profile Picture"
+                         class="img-fluid rounded-4 shadow-lg"
+                         style="max-height: 280px; width: 100%; object-fit: cover;">
                 {% else %}
-                    <img src="{{ url_for('static', filename='default-avatar.png') }}" 
-                         class="img-fluid rounded" alt="No photo" style="max-height: 300px;">
+                    <div class="text-center">
+                        <i class="fas fa-user-circle fa-6x" style="color: rgba(168, 85, 247, 0.3);"></i>
+                        <p class="mt-2 text-secondary">No photo available</p>
+                    </div>
                 {% endif %}
             </div>
 
-            <!-- Profile Details -->
+            <!-- Profile Details (right) -->
             <div class="col-md-8">
-                <div class="card-body">
+                <div class="card-body p-4">
                     <!-- Full Name -->
-                    <h2 class="card-title">
-                        {{ profile.first_name }} 
-                        {{ profile.middle_name or '' }} 
-                        {{ profile.last_name }}
+                    <h2 class="mb-2" style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+                        {{ profile.first_name }} {{ profile.middle_name or '' }} {{ profile.last_name }}
                     </h2>
 
                     <!-- Contact & Basic Info -->
-                    <p class="text-muted">
-                        <strong>Email:</strong> {{ profile.user.email }}<br>
-                        <strong>Mobile:</strong> {{ profile.mobile }}<br>
-                        <strong>Date of Birth:</strong> {{ profile.dob.strftime('%d-%b-%Y') if profile.dob else 'N/A' }}<br>
-                        <strong>Gender:</strong> {{ profile.gender }}
-                    </p>
-                    <hr>
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <span class="text-secondary"><i class="fas fa-envelope me-2" style="color: var(--primary-light);"></i>{{ profile.user.email }}</span>
+                        <span class="text-secondary"><i class="fas fa-phone me-2" style="color: var(--employer-light);"></i>{{ profile.mobile }}</span>
+                        <span class="text-secondary"><i class="fas fa-calendar-alt me-2" style="color: var(--accent-gold);"></i>{{ profile.dob.strftime('%d %b %Y') if profile.dob else 'N/A' }}</span>
+                        <span class="text-secondary"><i class="fas fa-venus-mars me-2" style="color: var(--primary-light);"></i>{{ profile.gender }}</span>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.05);">
 
                     <!-- Address -->
-                    <h5>📍 Address</h5>
-                    <p>{{ profile.address or 'Not provided' }}</p>
-                    <p><strong>City:</strong> {{ profile.city or 'N/A' }} &nbsp;|&nbsp; <strong>State:</strong> {{ profile.state or 'N/A' }} &nbsp;|&nbsp; <strong>Pincode:</strong> {{ profile.pincode or 'N/A' }}</p>
+                    <h5 class="section-title"><i class="fas fa-map-marker-alt me-2" style="color: var(--employer-light);"></i>Address</h5>
+                    <p class="text-secondary mb-1">{{ profile.address or 'Not provided' }}</p>
+                    <p class="text-secondary">
+                        <strong>Pincode:</strong> {{ profile.pincode or 'N/A' }}
+                    </p>
 
                     <!-- Father/Husband -->
-                    <h5>👤 Father's / Husband's Name</h5>
-                    <p>{{ profile.father_husband_name or 'Not provided' }}</p>
+                    <h5 class="section-title"><i class="fas fa-user-friends me-2" style="color: var(--primary-light);"></i>Father's / Husband's Name</h5>
+                    <p class="text-secondary">{{ profile.father_husband_name or 'Not provided' }}</p>
 
                     <!-- Education -->
-                    <h5>🎓 Education</h5>
-                    <p>{{ profile.education_level }}</p>
+                    <h5 class="section-title"><i class="fas fa-graduation-cap me-2" style="color: var(--primary-light);"></i>Education</h5>
+                    <p class="text-secondary">{{ profile.education_level }}</p>
                     {% if profile.education_other %}
-                        <p><strong>Other:</strong> {{ profile.education_other }}</p>
+                        <p class="text-secondary"><strong>Specialisation:</strong> {{ profile.education_other }}</p>
                     {% endif %}
 
                     <!-- Work Preferences -->
-                    <h5>💼 Work Preferences</h5>
-                    <p><strong>Employment Type:</strong> {{ profile.employment_type }}</p>
-                    <p><strong>Preferred Location 1:</strong> {{ profile.preferred_location1 }}</p>
-                    {% if profile.preferred_location2 %}
-                        <p><strong>Preferred Location 2:</strong> {{ profile.preferred_location2 }}</p>
-                    {% endif %}
-                    {% if profile.preferred_location3 %}
-                        <p><strong>Preferred Location 3:</strong> {{ profile.preferred_location3 }}</p>
-                    {% endif %}
+                    <h5 class="section-title"><i class="fas fa-briefcase me-2" style="color: var(--employer-light);"></i>Work Preferences</h5>
+                    <p class="text-secondary"><strong>Employment Type:</strong> {{ profile.employment_type }}</p>
+                    <p class="text-secondary"><strong>Preferred Locations:</strong>
+                        {{ profile.preferred_location1 }}
+                        {% if profile.preferred_location2 %}, {{ profile.preferred_location2 }}{% endif %}
+                        {% if profile.preferred_location3 %}, {{ profile.preferred_location3 }}{% endif %}
+                    </p>
 
                     <!-- Skills -->
-                    <h5>🛠️ Skills</h5>
-                    <p>{{ profile.skills or 'No skills listed' }}</p>
+                    <h5 class="section-title"><i class="fas fa-tools me-2" style="color: var(--accent-gold);"></i>Skills</h5>
+                    <p class="text-secondary">{{ profile.skills or 'No skills listed' }}</p>
 
                     <!-- Back Button -->
-                    <a href="{{ url_for('hire_dashboard') }}" class="btn btn-secondary mt-3">⬅ Back to List</a>
+                    <a href="{{ url_for('hire_dashboard') }}" class="btn btn-outline-soft mt-3">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Candidate List
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    /* Section headers inside the profile card */
+    .section-title {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: #E2E8F0;
+        margin-top: 1.25rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 6px;
+    }
+    /* Back button style (btn-outline-soft already defined in base.html) */
+</style>
 {% endblock %}

@@ -1,26 +1,76 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h2 class="mb-4">Available Candidates</h2>
-<div class="row">
-    {% for p in profiles %}
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card shadow h-100">
-            {% if p.profile_pic %}
-            <img src="{{ url_for('static', filename='uploads/' + p.profile_pic) }}" class="card-img-top" style="height:200px; object-fit:cover;">
-            {% else %}
-            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height:200px;">No Image</div>
-            {% endif %}
-            <div class="card-body">
-                <h5 class="card-title">{{ p.first_name }} {{ p.last_name }}</h5>
-                <p><strong>Education:</strong> {{ p.education_level }}{% if p.education_other %} - {{ p.education_other }}{% endif %}</p>
-                <p><strong>Location:</strong> {{ p.preferred_location1 }}</p>
-                <p><strong>Skills:</strong> {{ p.skills[:80] if p.skills else 'N/A' }}...</p>
-                <a href="{{ url_for('view_profile', profile_id=p.id) }}" class="btn btn-outline-primary btn-sm">View Full Profile</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">Available Candidates</h2>
+        <span class="text-secondary"><i class="fas fa-users me-2"></i>{{ profiles|length }} profile(s)</span>
+    </div>
+
+    <div class="row">
+        {% for p in profiles %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card-modern p-0 overflow-hidden h-100">
+                <!-- Image -->
+                <div class="position-relative" style="height: 200px; overflow: hidden;">
+                    {% if p.profile_pic %}
+                        <img src="{{ url_for('static', filename='uploads/' + p.profile_pic) }}"
+                             alt="{{ p.first_name }}"
+                             class="w-100 h-100"
+                             style="object-fit: cover; transition: transform 0.4s ease;">
+                    {% else %}
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center"
+                             style="background: rgba(168, 85, 247, 0.08); color: rgba(255,255,255,0.25); font-size: 2rem;">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                    {% endif %}
+                    <!-- Gradient overlay on hover -->
+                    <div class="position-absolute top-0 start-0 w-100 h-100"
+                         style="background: linear-gradient(to top, rgba(12,12,25,0.6) 0%, transparent 50%); pointer-events: none;"></div>
+                </div>
+                <!-- Body -->
+                <div class="p-4">
+                    <h5 class="card-title" style="font-family: var(--font-display); font-weight: 700; color: #F8FAFC;">
+                        {{ p.first_name }} {{ p.last_name }}
+                    </h5>
+                    <ul class="list-unstyled mt-3 mb-3" style="font-size: 0.9rem; color: #94A3B8;">
+                        <li class="mb-2">
+                            <i class="fas fa-graduation-cap me-2" style="color: var(--primary-light); width: 20px;"></i>
+                            {{ p.education_level }}{% if p.education_other %} - {{ p.education_other }}{% endif %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2" style="color: var(--employer-light); width: 20px;"></i>
+                            {{ p.preferred_location1 }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-tools me-2" style="color: var(--accent-gold); width: 20px;"></i>
+                            {{ p.skills[:80] if p.skills else 'N/A' }}{% if p.skills and p.skills|length > 80 %}...{% endif %}
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('view_profile', profile_id=p.id) }}" class="btn btn-soft-primary btn-sm w-100">
+                        <i class="fas fa-eye me-2"></i>View Full Profile
+                    </a>
+                </div>
             </div>
         </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert-modern alert-info text-center py-4">
+                <i class="fas fa-info-circle me-2"></i> No jobseeker profiles yet. Check back later.
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% else %}
-    <div class="col-12"><div class="alert alert-info">No jobseeker profiles yet.</div></div>
-    {% endfor %}
-</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    /* Subtle zoom on card image hover */
+    .card-modern:hover img {
+        transform: scale(1.05);
+    }
+    /* Ensure icon colours are bright enough */
+    .card-modern .fa-graduation-cap { color: var(--primary-light) !important; }
+    .card-modern .fa-map-marker-alt { color: var(--employer-light) !important; }
+    .card-modern .fa-tools { color: var(--accent-gold) !important; }
+</style>
 {% endblock %}

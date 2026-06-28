@@ -1,50 +1,166 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Create Account</h3>
-                <form method="POST" novalidate>
-                    {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                        {{ form.name.label(class="form-label") }}
-                        {{ form.name(class="form-control", placeholder="John Doe") }}
-                        {% for error in form.name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control", placeholder="you@example.com") }}
-                        {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control", placeholder="Min 8 characters", id="password") }}
-                            <!-- Strength bar -->
-                            <div class="progress mt-2" style="height: 6px;">
-                                <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <small id="password-strength-text" class="form-text"></small>
-                            {% for error in form.password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.confirm_password.label(class="form-label") }}
-                            {{ form.confirm_password(class="form-control", placeholder="Repeat password") }}
-                            {% for error in form.confirm_password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.role.label(class="form-label") }}
-                        {{ form.role(class="form-select") }}
-                    </div>
-                    {{ form.submit(class="btn btn-success w-100") }}
-                </form>
-                <p class="mt-3 text-center">Already have an account? <a href="{{ url_for('login') }}">Login</a>.</p>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5">
+        <!-- Glass card -->
+        <div class="card-modern p-4">
+            <div class="text-center mb-3">
+                <i class="fas fa-user-plus fa-2x" style="color: var(--primary-light); opacity: 0.7;"></i>
             </div>
+            <h3 class="text-center mb-4" style="font-family: var(--font-display); font-weight: 700; color: #F8FAFC;">
+                Create Account
+            </h3>
+            <form method="POST" novalidate>
+                {{ form.hidden_tag() }}
+
+                <!-- Name -->
+                <div class="mb-3">
+                    <label class="form-label-custom">{{ form.name.label.text }}</label>
+                    {{ form.name(class="form-control-dark", placeholder="John Doe") }}
+                    {% for error in form.name.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label-custom">{{ form.email.label.text }}</label>
+                    {{ form.email(class="form-control-dark", placeholder="you@example.com") }}
+                    {% for error in form.email.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Password & Confirm -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">{{ form.password.label.text }}</label>
+                        {{ form.password(class="form-control-dark", placeholder="Min 8 characters", id="password") }}
+                        <!-- Strength bar -->
+                        <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%; border-radius: 10px;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small id="password-strength-text" class="form-text"></small>
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">{{ form.confirm_password.label.text }}</label>
+                        {{ form.confirm_password(class="form-control-dark", placeholder="Repeat password") }}
+                        {% for error in form.confirm_password.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Role -->
+                <div class="mb-4">
+                    <label class="form-label-custom">{{ form.role.label.text }}</label>
+                    {{ form.role(class="form-select-dark") }}
+                </div>
+
+                {{ form.submit(class="btn btn-primary-gradient w-100 py-2") }}
+            </form>
+
+            <p class="mt-4 mb-0 text-center" style="color: #94A3B8;">
+                Already have an account?
+                <a href="{{ url_for('login') }}" style="color: var(--primary-light); font-weight: 600; text-decoration: none;">
+                    Login
+                </a>
+            </p>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    /* ---- Enhanced label and field visibility (same as login) ---- */
+    .form-label-custom {
+        font-weight: 500;
+        color: #E2E8F0;          /* brighter for contrast */
+        margin-bottom: 4px;
+        display: block;           /* ensures consistent left‑alignment */
+    }
+
+    .form-control-dark {
+        background: rgba(25, 25, 50, 0.85);   /* more opaque and lighter */
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        color: #F1F5F9;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-control-dark:focus {
+        background: rgba(30, 30, 60, 0.9);
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.35), inset 0 2px 4px rgba(0,0,0,0.2);
+        color: #fff;
+        outline: none;
+    }
+
+    .form-control-dark::placeholder {
+        color: #94A3B8;          /* lighter and clearly visible */
+        opacity: 0.8;
+    }
+
+    /* ---- Role select dropdown with clearly visible arrow ---- */
+    .form-select-dark {
+        background: rgba(25, 25, 50, 0.85);    /* match input background */
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        color: #F1F5F9;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        width: 100%;
+        box-sizing: border-box;
+        appearance: none;
+        /* Custom arrow – using white stroke for maximum visibility */
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 18px 14px;   /* slightly larger */
+        transition: all 0.3s ease;
+        /* Prevent text from overlapping the arrow */
+        padding-right: 2.5rem;
+    }
+
+    .form-select-dark:focus {
+        background-color: rgba(30, 30, 60, 0.9);
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+        color: #fff;
+        outline: none;
+    }
+
+    /* Ensure the dropdown arrow is always visible even when the select is focused */
+    .form-select-dark option {
+        background: #1a1a2e;
+        color: #F1F5F9;
+    }
+
+    /* ---- Password strength text ---- */
+    #password-strength-text {
+        color: rgba(255,255,255,0.5);
+        font-size: 0.8rem;
+        display: block;
+        margin-top: 4px;
+    }
+
+    /* ---- Extra: keep card glass effect consistent ---- */
+    .card-modern {
+        background: rgba(10, 10, 25, 0.7);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -66,19 +182,18 @@ document.addEventListener('DOMContentLoaded', function() {
         let percent = 0;
         let color = '';
         let text = '';
-        // score 0-2: weak (red), 3-4: medium (yellow), 5: strong (green)
         if (score <= 2) {
             percent = (score / 5) * 100;
-            color = '#dc3545';  // red
-            text = 'Weak';
+            color = '#EF4444';
+            text = 'Weak – try adding more character types';
         } else if (score <= 4) {
             percent = (score / 5) * 100;
-            color = '#ffc107';  // yellow
-            text = 'Medium';
+            color = '#F59E0B';
+            text = 'Medium – almost there';
         } else {
             percent = 100;
-            color = '#198754';  // green
-            text = 'Strong';
+            color = '#10B981';
+            text = 'Strong – great password!';
         }
         strengthBar.style.width = percent + '%';
         strengthBar.style.backgroundColor = color;

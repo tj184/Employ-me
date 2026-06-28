@@ -1,40 +1,333 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="hero-section text-center">
-    <h1 class="display-3 fw-bold text-white">Welcome to Employ-me</h1>
-    <p class="lead text-white-50 mb-5">Connecting talent with opportunity.</p>
-    <div class="d-flex justify-content-center gap-4 flex-wrap">
-        <a href="{{ url_for('jobseeker_dashboard') if current_user.is_authenticated and current_user.role == 'jobseeker' else url_for('signup', role='jobseeker') }}" class="btn btn-primary btn-lg px-5 py-3">I'm a Jobseeker</a>
-        <a href="{{ url_for('hire_dashboard') if current_user.is_authenticated and current_user.role == 'employer' else url_for('signup', role='employer') }}" class="btn btn-success btn-lg px-5 py-3">I want to Hire</a>
-    </div>
-</div>
-<div class="row mt-5 g-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow h-100">
-            <div class="card-body text-center">
-                <div class="icon-circle">👤</div>
-                <h5 class="card-title">Create Your Profile</h5>
-                <p class="card-text">Showcase your skills and experience with a complete profile.</p>
+    {% if current_user.is_authenticated %}
+        <!-- ===== LOGGED IN – Dynamic role-based hero ===== -->
+        <div class="dashboard-hero {% if current_user.role == 'jobseeker' %}jobseeker{% else %}employer{% endif %}">
+            <div class="container text-center py-3">
+                <h1 class="display-4 fw-bold">Welcome back, {{ current_user.name }}!</h1>
+                {% if current_user.role == 'jobseeker' %}
+                    <p class="lead">Your next opportunity is just a click away.</p>
+                    <a href="{{ url_for('jobseeker_dashboard') }}" class="btn btn-white btn-lg px-5 py-3 mt-3">
+                        <i class="fas fa-user-cog"></i> My Dashboard
+                    </a>
+                {% else %}
+                    <p class="lead">Discover top talent ready to work.</p>
+                    <a href="{{ url_for('hire_dashboard') }}" class="btn btn-white btn-lg px-5 py-3 mt-3">
+                        <i class="fas fa-search"></i> Find Candidates
+                    </a>
+                {% endif %}
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow h-100">
-            <div class="card-body text-center">
-                <div class="icon-circle">📸</div>
-                <h5 class="card-title">Upload Images</h5>
-                <p class="card-text">Add a professional photo and your resume/certificates.</p>
+    {% else %}
+        <!-- ===== VISITOR HERO – Glowing, immersive ===== -->
+        <div class="hero-index text-center py-5">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Employ-me" class="img-fluid mb-4" style="max-height: 120px;" />
+
+            <h1 class="display-3 fw-bold">
+                Welcome to <span class="gradient-text">Employ‑me</span>
+            </h1>
+            <p class="lead mb-5">Where talent meets opportunity – find jobs or hire with ease.</p>
+            <div class="d-flex justify-content-center gap-4 flex-wrap">
+                <a href="{{ url_for('signup', role='jobseeker') }}" class="btn btn-primary-gradient btn-lg px-5 py-3">
+                    <i class="fas fa-user-plus"></i> I'm a Jobseeker
+                </a>
+                <a href="{{ url_for('signup', role='employer') }}" class="btn btn-employer-gradient btn-lg px-5 py-3">
+                    <i class="fas fa-handshake"></i> I want to Hire
+                </a>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow h-100">
-            <div class="card-body text-center">
-                <div class="icon-circle">🤝</div>
-                <h5 class="card-title">Get Hired</h5>
-                <p class="card-text">Employers browse and connect with top candidates.</p>
+    {% endif %}
+
+    <!-- ===== HOW IT WORKS SECTION – Always visible, adapts to role ===== -->
+    <section id="how-it-works" class="py-5 mt-4">
+        <div class="container">
+            <h2 class="text-center mb-5" style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">
+                How It <span class="gradient-text">Works</span>
+            </h2>
+            <div class="row g-4 justify-content-center">
+                {% if not current_user.is_authenticated %}
+                    <!-- Both cards for visitors -->
+                    <div class="col-md-6">
+                        <div class="how-card how-card-jobseeker p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <h3 class="mb-0" style="font-family: var(--font-display); font-weight: 700; color: #F8FAFC;">For Jobseekers</h3>
+                            </div>
+                            <ul class="steps-list list-unstyled">
+                                <li class="step-item mb-4">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Sign Up / Login</h5>
+                                        <p class="step-text">Create your free account in seconds and access your personal dashboard.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item mb-4">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Complete Your Profile</h5>
+                                        <p class="step-text">Add your education, skills, work preferences and a professional photo.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Get Hired</h5>
+                                        <p class="step-text">Employers will find your profile and contact you directly – no middleman.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="how-card how-card-employer p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <h3 class="mb-0" style="font-family: var(--font-display); font-weight: 700; color: #F8FAFC;">For Employers</h3>
+                            </div>
+                            <ul class="steps-list list-unstyled">
+                                <li class="step-item mb-4">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Register / Login</h5>
+                                        <p class="step-text">Create your employer account and log in to start hiring.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item mb-4">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Complete Registration</h5>
+                                        <p class="step-text">Fill in your business information so candidates know who they're connecting with.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Hire Candidates</h5>
+                                        <p class="step-text">Browse qualified profiles, review their details, and hire the best fit for your needs.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% elif current_user.role == 'jobseeker' %}
+                    <!-- Only jobseeker card -->
+                    <div class="col-md-8 col-lg-6">
+                        <div class="how-card how-card-jobseeker p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <h3 class="mb-0" style="font-family: var(--font-display); font-weight: 700; color: #F8FAFC;">For Jobseekers</h3>
+                            </div>
+                            <ul class="steps-list list-unstyled">
+                                <li class="step-item mb-4">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Sign Up / Login</h5>
+                                        <p class="step-text">Create your free account in seconds and access your personal dashboard.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item mb-4">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Complete Your Profile</h5>
+                                        <p class="step-text">Add your education, skills, work preferences and a professional photo.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Get Hired</h5>
+                                        <p class="step-text">Employers will find your profile and contact you directly – no middleman.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% elif current_user.role == 'employer' %}
+                    <!-- Only employer card -->
+                    <div class="col-md-8 col-lg-6">
+                        <div class="how-card how-card-employer p-4 h-100">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-wrapper me-3">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <h3 class="mb-0" style="font-family: var(--font-display); font-weight: 700; color: #F8FAFC;">For Employers</h3>
+                            </div>
+                            <ul class="steps-list list-unstyled">
+                                <li class="step-item mb-4">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Register / Login</h5>
+                                        <p class="step-text">Create your employer account and log in to start hiring.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item mb-4">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Complete Registration</h5>
+                                        <p class="step-text">Fill in your business information so candidates know who they're connecting with.</p>
+                                    </div>
+                                </li>
+                                <li class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h5 class="step-title">Hire Candidates</h5>
+                                        <p class="step-text">Browse qualified profiles, review their details, and hire the best fit for your needs.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
-    </div>
-</div>
+    </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    /* ============================================================
+       HOW IT WORKS – Additional styles (specific to index)
+       ============================================================ */
+    .how-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 28px;
+        box-shadow: 0 20px 60px -16px rgba(0,0,0,0.4);
+        transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        position: relative;
+        overflow: hidden;
+    }
+    .how-card::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 28px;
+        padding: 1px;
+        background: linear-gradient(145deg, rgba(168, 85, 247, 0.3), rgba(34, 211, 238, 0.1), transparent 80%);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    .how-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 30px 80px -16px rgba(168, 85, 247, 0.15);
+        border-color: rgba(168, 85, 247, 0.2);
+    }
+    .how-card-jobseeker:hover::before {
+        background: linear-gradient(145deg, rgba(168, 85, 247, 0.6), rgba(34, 211, 238, 0.4));
+    }
+    .how-card-employer:hover::before {
+        background: linear-gradient(145deg, rgba(34, 211, 238, 0.6), rgba(168, 85, 247, 0.4));
+    }
+
+    .icon-wrapper {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        background: rgba(168, 85, 247, 0.1);
+        color: var(--primary-light);
+        border: 1px solid rgba(168, 85, 247, 0.15);
+        transition: all 0.3s ease;
+    }
+    .how-card-employer .icon-wrapper {
+        background: rgba(34, 211, 238, 0.1);
+        color: var(--employer-light);
+        border-color: rgba(34, 211, 238, 0.15);
+    }
+    .how-card:hover .icon-wrapper {
+        transform: scale(1.05);
+    }
+    .how-card-jobseeker:hover .icon-wrapper {
+        background: var(--primary-gradient);
+        color: #fff;
+        box-shadow: var(--primary-glow);
+    }
+    .how-card-employer:hover .icon-wrapper {
+        background: var(--employer-gradient);
+        color: #fff;
+        box-shadow: var(--employer-glow);
+    }
+
+    .steps-list {
+        padding-left: 0;
+    }
+    .step-item {
+        display: flex;
+        align-items: flex-start;
+    }
+    .step-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(168, 85, 247, 0.15);
+        color: var(--primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-right: 16px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+    .how-card-employer .step-number {
+        background: rgba(34, 211, 238, 0.15);
+        color: var(--employer-light);
+    }
+    .how-card:hover .step-number {
+        background: var(--primary-gradient);
+        color: #fff;
+        box-shadow: var(--primary-glow);
+    }
+    .how-card-employer:hover .step-number {
+        background: var(--employer-gradient);
+        box-shadow: var(--employer-glow);
+    }
+    .step-content {
+        flex: 1;
+    }
+    .step-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #F8FAFC;
+        margin-bottom: 4px;
+    }
+    .step-text {
+        color: #94A3B8;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    /* On mobile, reduce card padding */
+    @media (max-width: 576px) {
+        .how-card {
+            padding: 28px 20px !important;
+        }
+        .step-title {
+            font-size: 1rem;
+        }
+    }
+</style>
 {% endblock %}

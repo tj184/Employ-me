@@ -1,212 +1,255 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h2 class="mb-4">My Profile</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">My Profile</h2>
+    {% if profile %}
+        <span class="badge bg-success bg-opacity-25 text-success px-3 py-2 rounded-pill">
+            <i class="fas fa-check-circle me-1"></i> Profile Complete
+        </span>
+    {% endif %}
+</div>
+
 <div class="row">
+    <!-- Main Form Column -->
     <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-body">
-                <form method="POST" enctype="multipart/form-data" novalidate>
-                    {{ form.hidden_tag() }}
+        <div class="card-modern p-4">
+            <form method="POST" enctype="multipart/form-data" id="profile-form" novalidate>
+                {{ form.hidden_tag() }}
 
-                    <!-- Name Section -->
-                    <h5>Name</h5>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            {{ form.first_name.label }}
-                            {% if form.first_name.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.first_name(class="form-control") }}
-                            {% for err in form.first_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            {{ form.middle_name.label }}
-                            {{ form.middle_name(class="form-control") }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            {{ form.last_name.label }}
-                            {% if form.last_name.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.last_name(class="form-control") }}
-                            {% for err in form.last_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                <!-- Name Section -->
+                <h5 class="section-title"><i class="fas fa-user me-2"></i>Name</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label-custom">
+                            {{ form.first_name.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'first_name' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.first_name.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.first_name(class="form-control-dark") }}
+                        {% endif %}
+                        {% for err in form.first_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">{{ form.middle_name.label.text }}</label>
+                        {{ form.middle_name(class="form-control-dark") }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">
+                            {{ form.last_name.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'last_name' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.last_name.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.last_name(class="form-control-dark") }}
+                        {% endif %}
+                        {% for err in form.last_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <!-- Personal Details (locked after save) -->
+                <h5 class="section-title mt-4"><i class="fas fa-id-card me-2"></i>Personal Details <small class="text-warning">(locked after saving)</small></h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.dob.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'dob' in locked_fields %}
+                            <input class="form-control-dark" type="date" value="{{ form.dob.data.strftime('%Y-%m-%d') if form.dob.data else '' }}" readonly>
+                        {% else %}
+                            {{ form.dob(class="form-control-dark", type="date") }}
+                        {% endif %}
+                        {% for err in form.dob.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.gender.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'gender' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.gender.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.gender(class="form-select-dark") }}
+                        {% endif %}
+                        {% for err in form.gender.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label-custom">
+                        {{ form.address.label.text }} <span class="text-danger">*</span>
+                    </label>
+                    {% if 'address' in locked_fields %}
+                        <textarea class="form-control-dark" rows="3" readonly>{{ form.address.data or '' }}</textarea>
+                    {% else %}
+                        {{ form.address(class="form-control-dark", rows=3) }}
+                    {% endif %}
+                    {% for err in form.address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.pincode.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'pincode' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.pincode.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.pincode(class="form-control-dark") }}
+                        {% endif %}
+                        {% for err in form.pincode.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.mobile.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'mobile' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.mobile.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.mobile(class="form-control-dark") }}
+                        {% endif %}
+                        {% for err in form.mobile.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.city.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'city' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.city.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.city(class="form-control-dark") }}
+                        {% endif %}
+                        {% for err in form.city.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.state.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'state' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.state.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.state(class="form-control-dark") }}
+                        {% endif %}
+                        {% for err in form.state.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label-custom">
+                        {{ form.father_husband_name.label.text }} <span class="text-danger">*</span>
+                    </label>
+                    {% if 'father_husband_name' in locked_fields %}
+                        <input class="form-control-dark" value="{{ form.father_husband_name.data or '' }}" readonly>
+                    {% else %}
+                        {{ form.father_husband_name(class="form-control-dark") }}
+                    {% endif %}
+                    {% for err in form.father_husband_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+
+                <!-- Education (always editable) -->
+                <h5 class="section-title mt-4"><i class="fas fa-graduation-cap me-2"></i>Education</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">{{ form.education_level.label.text }}</label>
+                        {{ form.education_level(class="form-select-dark", id="education_level") }}
+                        {% for err in form.education_level.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6" id="education_other_group" style="display:none;">
+                        <label class="form-label-custom">{{ form.education_other.label.text }}</label>
+                        {{ form.education_other(class="form-control-dark") }}
+                    </div>
+                </div>
+
+                <!-- Work Preferences (always editable) -->
+                <h5 class="section-title mt-4"><i class="fas fa-briefcase me-2"></i>Work Preferences</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label-custom">
+                            {{ form.preferred_location1.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.preferred_location1(class="form-select-dark") }}
+                        {% for err in form.preferred_location1.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">{{ form.preferred_location2.label.text }}</label>
+                        {{ form.preferred_location2(class="form-select-dark") }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">{{ form.preferred_location3.label.text }}</label>
+                        {{ form.preferred_location3(class="form-select-dark") }}
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label-custom">{{ form.employment_type.label.text }}</label>
+                    {{ form.employment_type(class="form-select-dark") }}
+                </div>
+
+                <!-- Skills (always editable) -->
+                <h5 class="section-title mt-4"><i class="fas fa-tools me-2"></i>Skills</h5>
+                <div class="row">
+                    {% for subfield in form.selected_skills %}
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-check-dark">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
                         </div>
                     </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-3">
+                    <label class="form-label-custom">{{ form.custom_skills.label.text }}</label>
+                    {{ form.custom_skills(class="form-control-dark", placeholder="e.g., Cooking, Driving") }}
+                </div>
 
-                    <!-- Personal Details -->
-                    <h5>Personal Details</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.dob.label }}
-                            {% if form.dob.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.dob(class="form-control", type="date") }}
-                            {% for err in form.dob.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.gender.label }}
-                            {% if form.gender.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.gender(class="form-select") }}
-                            {% for err in form.gender.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
+                <!-- Images (always editable) -->
+                <h5 class="section-title mt-4"><i class="fas fa-camera me-2"></i>Images</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">{{ form.profile_pic.label.text }}</label>
+                        {{ form.profile_pic(class="form-control-dark") }}
+                        {% if profile and profile.profile_pic %}
+                            <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" class="img-thumbnail-modern mt-2" width="150">
+                        {% endif %}
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">{{ form.aadhar_card.label.text }}</label>
+                        {{ form.aadhar_card(class="form-control-dark") }}
+                        {% if profile and profile.aadhar_card %}
+                            <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" class="img-thumbnail-modern mt-2" width="150">
+                        {% endif %}
+                    </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.city.label }}
-                            {% if form.city.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.city(class="form-control") }}
-                            {% for err in form.city.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.state.label }}
-                            {% if form.state.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.state(class="form-control") }}
-                            {% for err in form.state.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.address.label }}
-                        {% if form.address.flags.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ form.address(class="form-control", rows=3) }}
-                        {% for err in form.address.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.pincode.label }}
-                            {% if form.pincode.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.pincode(class="form-control") }}
-                            {% for err in form.pincode.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.mobile.label }}
-                            {% if form.mobile.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.mobile(class="form-control") }}
-                            {% for err in form.mobile.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.father_husband_name.label }}
-                        {% if form.father_husband_name.flags.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ form.father_husband_name(class="form-control") }}
-                        {% for err in form.father_husband_name.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                    </div>
-
-                    <!-- Education -->
-                    <h5>Education</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.education_level.label }}
-                            {% if form.education_level.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.education_level(class="form-select", id="education_level") }}
-                            {% for err in form.education_level.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3" id="education_other_group" style="display:none;">
-                            {{ form.education_other.label }}
-                            {{ form.education_other(class="form-control") }}
-                        </div>
-                    </div>
-
-                    <!-- Work Preferences -->
-                    <h5>Work Preferences</h5>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            {{ form.preferred_location1.label }}
-                            {% if form.preferred_location1.flags.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ form.preferred_location1(class="form-control", list="cities") }}
-                            {% for err in form.preferred_location1.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            {{ form.preferred_location2.label }}
-                            {{ form.preferred_location2(class="form-control", list="cities") }}
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            {{ form.preferred_location3.label }}
-                            {{ form.preferred_location3(class="form-control", list="cities") }}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.employment_type.label }}
-                        {% if form.employment_type.flags.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ form.employment_type(class="form-select") }}
-                        {% for err in form.employment_type.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
-                    </div>
-
-                    <!-- Skills -->
-                    <h5>Skills</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Select Skills (check all that apply)</label>
-                        <div class="row">
-                            {% for subfield in form.selected_skills %}
-                            <div class="col-md-4 col-sm-6">
-                                <div class="form-check">
-                                    {{ subfield(class="form-check-input") }}
-                                    {{ subfield.label(class="form-check-label") }}
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.custom_skills.label }}
-                        {{ form.custom_skills(class="form-control", placeholder="e.g., Cooking, Driving") }}
-                    </div>
-
-                    <!-- Images -->
-                    <h5>Images</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.profile_pic.label }}
-                            {{ form.profile_pic(class="form-control") }}
-                            {% if profile and profile.profile_pic %}
-                                <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" class="img-thumbnail mt-2" width="150">
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.aadhar_card.label }}
-                            {{ form.aadhar_card(class="form-control") }}
-                            {% if profile and profile.aadhar_card %}
-                                <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" class="img-thumbnail mt-2" width="150">
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    {{ form.submit(class="btn btn-primary") }}
-                </form>
-            </div>
+                <div class="mt-4">
+                    <button type="button" id="save-btn" class="btn btn-primary-gradient px-5">
+                        <i class="fas fa-save me-2"></i> Save Profile
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Profile Preview -->
+    <!-- Profile Preview Sidebar -->
     <div class="col-md-4">
-        <div class="card bg-light">
-            <div class="card-body">
-                <h5>Profile Preview</h5>
-                <hr>
-                {% if profile %}
+        <div class="card-modern p-4 sticky-top" style="top: 100px;">
+            <h5 class="section-title"><i class="fas fa-eye me-2"></i>Profile Preview</h5>
+            {% if profile %}
                 <p><strong>Name:</strong> {{ profile.first_name }} {{ profile.middle_name or '' }} {{ profile.last_name }}</p>
-                <p><strong>City:</strong> {{ profile.city or 'N/A' }}</p>
-                <p><strong>State:</strong> {{ profile.state or 'N/A' }}</p>
-                <p><strong>Location 1:</strong> {{ profile.preferred_location1 }}</p>
+                <p><strong>Location:</strong> {{ profile.preferred_location1 }}</p>
                 <p><strong>Education:</strong> {{ profile.education_level }}{% if profile.education_other %} - {{ profile.education_other }}{% endif %}</p>
                 <p><strong>Employment:</strong> {{ profile.employment_type }}</p>
-                {% else %}
-                <p class="text-muted">Profile not completed yet.</p>
-                {% endif %}
-            </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-user-edit fa-3x mb-3" style="color: rgba(168,85,247,0.3);"></i>
+                    <p class="text-secondary">Complete the form to see your profile preview.</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Datalist for city autocomplete -->
-<datalist id="cities">
-    {% for city in cities %}
-    <option value="{{ city }}">
-    {% endfor %}
-</datalist>
-
 <script>
-// Toggle education 'Other' field
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle education 'Other' field
     const eduSelect = document.getElementById('education_level');
     const otherGroup = document.getElementById('education_other_group');
     function toggleOther() {
@@ -218,7 +261,82 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     eduSelect.addEventListener('change', toggleOther);
-    toggleOther();  // initial state
+    toggleOther();
+
+    // Confirmation before saving
+    const form = document.getElementById('profile-form');
+    const saveBtn = document.getElementById('save-btn');
+
+    saveBtn.addEventListener('click', function(e) {
+        if (!confirm('Are you sure you want to save your profile? Critical fields will be locked after saving.')) {
+            e.preventDefault();
+            return false;
+        }
+        // Submit the form
+        form.submit();
+    });
 });
 </script>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .section-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: var(--text-primary);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .form-label-custom {
+        font-weight: 500;
+        color: #CBD5E1;
+        margin-bottom: 6px;
+    }
+    .form-control-dark,
+    .form-select-dark {
+        background: rgba(15, 15, 30, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: #F1F5F9;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    .form-control-dark:focus,
+    .form-select-dark:focus {
+        background: rgba(20, 20, 45, 0.8);
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+        color: #fff;
+        outline: none;
+    }
+    .form-control-dark[readonly],
+    .form-select-dark[readonly] {
+        background: rgba(15, 15, 30, 0.3);
+        border-color: rgba(255, 255, 255, 0.03);
+        color: #94A3B8;
+        cursor: not-allowed;
+    }
+    .form-check-dark .form-check-input {
+        background-color: rgba(15, 15, 30, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .form-check-dark .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+    .form-check-dark .form-check-label {
+        color: #CBD5E1;
+        font-size: 0.9rem;
+    }
+    .img-thumbnail-modern {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(20,20,40,0.5);
+        padding: 4px;
+        max-width: 150px;
+    }
+</style>
 {% endblock %}

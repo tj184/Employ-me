@@ -4,9 +4,10 @@ from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms.validators import DataRequired
 from config import Config
 from models import db, User, JobSeekerProfile
-from forms import LoginForm, SignupForm, ProfileForm, INDIAN_CITIES, SKILLS_CHOICES   # added INDIAN_CITIES
+from forms import LoginForm, SignupForm, ProfileForm, INDIAN_CITIES, SKILLS_CHOICES
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -15,6 +16,8 @@ db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -34,7 +37,6 @@ def save_image(file):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Custom decorator for role-based access
 def role_required(role):
     def decorator(func):
         from functools import wraps
@@ -47,7 +49,6 @@ def role_required(role):
         return wrapper
     return decorator
 
-# ---------- Routes ----------
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -103,40 +104,45 @@ def jobseeker_dashboard():
     profile = JobSeekerProfile.query.filter_by(user_id=current_user.id).first()
     form = ProfileForm(obj=profile)
 
+    # If profile exists, remove DataRequired from locked fields
+    if profile:
+        locked_fields = ['first_name', 'last_name', 'dob', 'gender', 'address',
+                         'pincode', 'mobile', 'father_husband_name', 'city', 'state']
+        for field_name in locked_fields:
+            field = getattr(form, field_name)
+            field.validators = [v for v in field.validators if not isinstance(v, DataRequired)]
+
     if form.validate_on_submit():
         if not profile:
             profile = JobSeekerProfile(user_id=current_user.id)
             db.session.add(profile)
 
-        # Name parts
-        profile.first_name = form.first_name.data
-        profile.middle_name = form.middle_name.data
-        profile.last_name = form.last_name.data
+            # New profile → assign all fields
+            profile.first_name = form.first_name.data
+            profile.middle_name = form.middle_name.data
+            profile.last_name = form.last_name.data
+            profile.dob = form.dob.data
+            profile.gender = form.gender.data
+            profile.address = form.address.data
+            profile.pincode = form.pincode.data
+            profile.mobile = form.mobile.data
+            profile.father_husband_name = form.father_husband_name.data
+            profile.city = form.city.data
+            profile.state = form.state.data
+        else:
+            # Existing profile → locked fields are NOT updated
+            pass
 
-        # Personal
-        profile.dob = form.dob.data
-        profile.gender = form.gender.data
-        profile.address = form.address.data
-        profile.pincode = form.pincode.data
-        profile.mobile = form.mobile.data
-        profile.father_husband_name = form.father_husband_name.data
-
-        # NEW: City and State
-        profile.city = form.city.data
-        profile.state = form.state.data
-
-        # Education
+        # Editable fields (always updated)
         profile.education_level = form.education_level.data
         profile.education_other = form.education_other.data if form.education_level.data == 'Others' else None
-
-        # Work preferences (now text fields with autocomplete)
         profile.preferred_location1 = form.preferred_location1.data
         profile.preferred_location2 = form.preferred_location2.data or None
         profile.preferred_location3 = form.preferred_location3.data or None
         profile.employment_type = form.employment_type.data
 
-        # Skills: combine selected checkboxes + custom text
-        selected = form.selected_skills.data  # list of values
+        # Skills
+        selected = form.selected_skills.data
         skills_list = []
         if selected:
             label_map = dict(SKILLS_CHOICES)
@@ -150,19 +156,15 @@ def jobseeker_dashboard():
             old = profile.profile_pic
             filename = save_image(form.profile_pic.data)
             if filename:
-                if old:
-                    old_path = os.path.join(app.config['UPLOAD_FOLDER'], old)
-                    if os.path.exists(old_path):
-                        os.remove(old_path)
+                if old and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], old)):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], old))
                 profile.profile_pic = filename
         if form.aadhar_card.data:
             old = profile.aadhar_card
             filename = save_image(form.aadhar_card.data)
             if filename:
-                if old:
-                    old_path = os.path.join(app.config['UPLOAD_FOLDER'], old)
-                    if os.path.exists(old_path):
-                        os.remove(old_path)
+                if old and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], old)):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], old))
                 profile.aadhar_card = filename
 
         db.session.commit()
@@ -180,7 +182,6 @@ def jobseeker_dashboard():
         form.pincode.data = profile.pincode
         form.mobile.data = profile.mobile
         form.father_husband_name.data = profile.father_husband_name
-        # NEW: city and state
         form.city.data = profile.city
         form.state.data = profile.state
         form.education_level.data = profile.education_level
@@ -189,7 +190,7 @@ def jobseeker_dashboard():
         form.preferred_location2.data = profile.preferred_location2
         form.preferred_location3.data = profile.preferred_location3
         form.employment_type.data = profile.employment_type
-        # Pre-select skills checkboxes: we have stored labels; map back to values
+
         if profile.skills:
             stored_skills = [s.strip() for s in profile.skills.split(',')]
             label_to_value = {v: k for k, v in SKILLS_CHOICES}
@@ -205,8 +206,12 @@ def jobseeker_dashboard():
         else:
             form.selected_skills.data = []
 
-    # Pass the full list of cities to the template for datalist
-    return render_template('jobseeker_dashboard.html', form=form, profile=profile, cities=INDIAN_CITIES)
+    return render_template('jobseeker_dashboard.html',
+                           form=form,
+                           profile=profile,
+                           cities=INDIAN_CITIES,
+                           locked_fields=['first_name', 'last_name', 'dob', 'gender', 'address',
+                                          'pincode', 'mobile', 'father_husband_name', 'city', 'state'] if profile else [])
 
 @app.route('/hire')
 @login_required
@@ -222,7 +227,6 @@ def view_profile(profile_id):
     profile = JobSeekerProfile.query.get_or_404(profile_id)
     return render_template('view_profile.html', profile=profile)
 
-# Error handlers
 @app.errorhandler(404)
 def not_found(e):
     return render_template('base.html', content='Page not found'), 404
@@ -230,4 +234,4 @@ def not_found(e):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
