@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">Business Profile</h2>
+    {% if profile %}
+        <span class="badge bg-success bg-opacity-25 text-success px-3 py-2 rounded-pill">
+            <i class="fas fa-check-circle me-1"></i> Profile Complete
+        </span>
+    {% endif %}
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <form method="POST" novalidate>
+                {{ form.hidden_tag() }}
+
+                <h5 class="section-title"><i class="fas fa-building me-2"></i>Business Details</h5>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">
+                        {{ form.business_name.label.text }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.business_name(class="form-control-dark", placeholder="Enter your business name") }}
+                    {% for err in form.business_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">
+                        {{ form.business_address.label.text }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.business_address(class="form-control-dark", rows=3, placeholder="Full business address") }}
+                    {% for err in form.business_address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.gst_number.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.gst_number(class="form-control-dark", placeholder="22AAAAA0000A1Z5") }}
+                        {% for err in form.gst_number.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.business_type.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.business_type(class="form-select-dark") }}
+                        {% for err in form.business_type.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <h5 class="section-title mt-4"><i class="fas fa-user-tie me-2"></i>Contact Person</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.contact_person_name.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.contact_person_name(class="form-control-dark", placeholder="Full name") }}
+                        {% for err in form.contact_person_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">
+                            {{ form.contact_person_phone.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.contact_person_phone(class="form-control-dark", placeholder="10-digit mobile number") }}
+                        {% for err in form.contact_person_phone.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="mb-3">
+    <label class="form-label-custom">
+        {{ form.dob.label.text }} <span class="text-danger">*</span>
+    </label>
+    {{ form.dob(class="form-control-dark", type="date") }}
+    {% for err in form.dob.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+</div>
+                </div>
+
+                <div class="mt-4">
+                    {{ form.submit(class="btn btn-primary-gradient px-5") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .section-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: var(--text-primary);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .form-label-custom {
+        font-weight: 500;
+        color: #CBD5E1;
+        margin-bottom: 6px;
+    }
+    .form-control-dark,
+    .form-select-dark {
+        background: rgba(15, 15, 30, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: #F1F5F9;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    .form-control-dark:focus,
+    .form-select-dark:focus {
+        background: rgba(20, 20, 45, 0.8);
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+        color: #fff;
+        outline: none;
+    }
+    .form-select-dark {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+    }
+</style>
+{% endblock %}

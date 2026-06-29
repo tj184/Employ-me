@@ -206,3 +206,19 @@ class ProfileForm(FlaskForm):
     aadhar_card = FileField('Aadhaar Card (not shared with employers)', validators=[FileAllowed(['jpg','png','jpeg'], 'Images only!')])
 
     submit = SubmitField('Save Profile')
+
+class EmployerForm(FlaskForm):
+    business_name = StringField('Business Name', validators=[DataRequired(), Length(max=150)])
+    business_address = TextAreaField('Business Address', validators=[DataRequired(), Length(max=300)])
+    gst_number = StringField('GST Number', validators=[DataRequired(), Length(max=30)])
+    business_type = SelectField('Business Type', choices=[
+        ('Retail', 'Retail'),
+        ('Wholesale', 'Wholesale'),
+        ('Service', 'Service'),
+        ('Manufacturing', 'Manufacturing'),
+        ('Other', 'Other')
+    ], validators=[DataRequired()])
+    contact_person_name = StringField('Contact Person Name', validators=[DataRequired(), Length(max=100)])
+    contact_person_phone = StringField('Contact Person Phone', validators=[DataRequired(), Length(max=15)])
+    dob = DateField('Date of Birth (for verification)', validators=[DataRequired()], format='%Y-%m-%d')
+    submit = SubmitField('Save Business Profile')

@@ -32,8 +32,14 @@
                         {% for err in form.first_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label-custom">{{ form.middle_name.label.text }}</label>
-                        {{ form.middle_name(class="form-control-dark") }}
+                        <label class="form-label-custom">
+                            {{ form.middle_name.label.text }}
+                        </label>
+                        {% if 'middle_name' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.middle_name.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.middle_name(class="form-control-dark") }}
+                        {% endif %}
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-custom">
@@ -145,8 +151,8 @@
                     {% for err in form.father_husband_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
 
-                <!-- Education (always editable) -->
-                <h5 class="section-title mt-4"><i class="fas fa-graduation-cap me-2"></i>Education</h5>
+                <!-- Education (always editable, but mandatory) -->
+                <h5 class="section-title mt-4"><i class="fas fa-graduation-cap me-2"></i>Education <span class="text-danger">*</span></h5>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label-custom">{{ form.education_level.label.text }}</label>
@@ -183,8 +189,9 @@
                     {{ form.employment_type(class="form-select-dark") }}
                 </div>
 
-                <!-- Skills (always editable) -->
-                <h5 class="section-title mt-4"><i class="fas fa-tools me-2"></i>Skills</h5>
+                <!-- Skills (always editable, at least one required) -->
+                <h5 class="section-title mt-4"><i class="fas fa-tools me-2"></i>Skills <span class="text-danger">*</span></h5>
+                <p class="text-secondary small">Select at least one skill or enter a custom skill.</p>
                 <div class="row">
                     {% for subfield in form.selected_skills %}
                     <div class="col-md-4 col-sm-6">
@@ -200,27 +207,39 @@
                     {{ form.custom_skills(class="form-control-dark", placeholder="e.g., Cooking, Driving") }}
                 </div>
 
-                <!-- Images (always editable) -->
+                <!-- Images -->
                 <h5 class="section-title mt-4"><i class="fas fa-camera me-2"></i>Images</h5>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label-custom">{{ form.profile_pic.label.text }}</label>
+                        <label class="form-label-custom">
+                            {{ form.profile_pic.label.text }}
+                            {% if not profile %}<span class="text-danger">*</span>{% endif %}
+                        </label>
                         {{ form.profile_pic(class="form-control-dark") }}
                         {% if profile and profile.profile_pic %}
                             <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" class="img-thumbnail-modern mt-2" width="150">
                         {% endif %}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label-custom">{{ form.aadhar_card.label.text }}</label>
-                        {{ form.aadhar_card(class="form-control-dark") }}
-                        {% if profile and profile.aadhar_card %}
-                            <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" class="img-thumbnail-modern mt-2" width="150">
+                        <label class="form-label-custom">
+                            {{ form.aadhar_card.label.text }}
+                            {% if 'aadhar_card' not in locked_fields %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+                        {% if 'aadhar_card' in locked_fields %}
+                            <!-- Already locked – show image only -->
+                            {% if profile and profile.aadhar_card %}
+                                <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" class="img-thumbnail-modern d-block" width="150">
+                            {% else %}
+                                <p class="text-muted">No Aadhaar card uploaded.</p>
+                            {% endif %}
+                        {% else %}
+                            {{ form.aadhar_card(class="form-control-dark") }}
                         {% endif %}
                     </div>
                 </div>
 
                 <div class="mt-4">
-                    <button type="button" id="save-btn" class="btn btn-primary-gradient px-5">
+                    <button type="submit" id="save-btn" class="btn btn-primary-gradient px-5">
                         <i class="fas fa-save me-2"></i> Save Profile
                     </button>
                 </div>
@@ -263,17 +282,13 @@ document.addEventListener('DOMContentLoaded', function() {
     eduSelect.addEventListener('change', toggleOther);
     toggleOther();
 
-    // Confirmation before saving
+    // Confirmation on submit (works with Enter key too)
     const form = document.getElementById('profile-form');
-    const saveBtn = document.getElementById('save-btn');
-
-    saveBtn.addEventListener('click', function(e) {
+    form.addEventListener('submit', function(e) {
         if (!confirm('Are you sure you want to save your profile? Critical fields will be locked after saving.')) {
             e.preventDefault();
             return false;
         }
-        // Submit the form
-        form.submit();
     });
 });
 </script>

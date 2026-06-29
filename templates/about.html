@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Glass card -->
+            <div class="card-modern p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-users fa-3x" style="color: var(--primary-light); opacity: 0.7;"></i>
+                </div>
+                <h1 class="text-center mb-4" style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+                    About <span class="gradient-text">Employ‑me</span>
+                </h1>
+                <p class="lead text-secondary">
+                    We are on a mission to bridge the gap between talented jobseekers and forward‑thinking employers.
+                </p>
+
+                <h5 class="section-title mt-4"><i class="fas fa-eye me-2" style="color: var(--primary-light);"></i>Our Vision</h5>
+                <p class="text-secondary">
+                    To create a world where every skilled individual finds the right opportunity, and every business discovers the perfect talent – without friction, without middlemen.
+                </p>
+
+                <h5 class="section-title mt-4"><i class="fas fa-rocket me-2" style="color: var(--employer-light);"></i>Our Mission</h5>
+                <p class="text-secondary">
+                    <strong>Employ‑me</strong> simplifies the hiring process by letting jobseekers build complete, verified profiles and giving employers direct access to these profiles. We remove the clutter of traditional job portals and focus on what really matters – your skills and your needs.
+                </p>
+
+                <h5 class="section-title mt-4"><i class="fas fa-shield-alt me-2" style="color: var(--accent-gold);"></i>Why Choose Us?</h5>
+                <ul class="text-secondary">
+                    <li>🔍 <strong>Direct Connections</strong> – No agents, no spam.</li>
+                    <li>📸 <strong>Verified Profiles</strong> – Aadhaar‑backed authenticity for serious candidates.</li>
+                    <li>🎯 <strong>Skill‑Based Matching</strong> – Find exactly what you’re looking for.</li>
+                    <li>💼 <strong>For Everyone</strong> – From retail shops to corporate offices, from freshers to experienced professionals.</li>
+                </ul>
+
+                <h5 class="section-title mt-4"><i class="fas fa-handshake me-2" style="color: var(--primary-light);"></i>Our Team</h5>
+                <p class="text-secondary">
+                    We are a small but passionate team of developers, designers, and HR experts dedicated to making employment accessible and transparent. Though we’re just starting, our commitment to quality and trust drives everything we build.
+                </p>
+
+                <div class="text-center mt-5">
+                    <p class="text-secondary">Ready to take the next step?</p>
+                    {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('signup') }}" class="btn btn-primary-gradient px-5 py-3">
+                            <i class="fas fa-user-plus me-2"></i> Join Now
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-soft px-5 py-3">
+                            <i class="fas fa-home me-2"></i> Back to Home
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .section-title {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: #E2E8F0;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 6px;
+        margin-bottom: 12px;
+    }
+</style>
+{% endblock %}

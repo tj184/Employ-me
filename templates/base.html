@@ -546,45 +546,52 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Employ-me logo" />
-                <span>Employ‑me</span>
-            </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2">
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <span class="navbar-text">
-                                <i class="fas fa-user-circle"></i>
-                                {{ current_user.name }}
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn-outline-custom" href="{{ url_for('logout') }}">
-                                <i class="fas fa-sign-out-alt me-1"></i> Logout
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">
-                                <i class="fas fa-arrow-right-to-bracket me-1"></i> Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn-primary-custom" href="{{ url_for('signup') }}">
-                                <i class="fas fa-user-plus me-1"></i> Sign Up
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Employ-me logo" />
+            <span>Employ‑me</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2">
+                <!-- About Us link – always visible -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('about') }}">
+                        <i class="fas fa-info-circle me-1"></i> About
+                    </a>
+                </li>
+
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="navbar-text">
+                            <i class="fas fa-user-circle"></i>
+                            {{ current_user.name }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-outline-custom" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-arrow-right-to-bracket me-1"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-primary-custom" href="{{ url_for('signup') }}">
+                            <i class="fas fa-user-plus me-1"></i> Sign Up
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <main>
         <div class="container my-4">
