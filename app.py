@@ -271,9 +271,9 @@ def hire_dashboard():
         flash('Please complete your business profile first.', 'warning')
         return redirect(url_for('employer_profile'))
 
-    profiles = JobSeekerProfile.query.all()
+    # Only show verified jobseekers
+    profiles = JobSeekerProfile.query.filter_by(verified=True).all()
     return render_template('hire_dashboard.html', profiles=profiles)
-
 @app.route('/view/<int:profile_id>')
 @login_required
 @role_required('employer')

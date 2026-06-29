@@ -56,6 +56,7 @@ class JobSeekerProfile(db.Model):
     aadhar_card = db.Column(db.String(200))
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    verified = db.Column(db.Boolean, default=False, nullable=False)
 
 
 class EmployerProfile(db.Model):

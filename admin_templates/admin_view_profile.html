@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Admin Panel</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light btn-sm">Back to Dashboard</a>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h2>{{ profile.first_name }} {{ profile.middle_name or '' }} {{ profile.last_name }}</h2>
+        <hr>
+        <p><strong>Email:</strong> {{ profile.user.email }}</p>
+        <p><strong>Mobile:</strong> {{ profile.mobile }}</p>
+        <p><strong>Date of Birth:</strong> {{ profile.dob }}</p>
+        <p><strong>Gender:</strong> {{ profile.gender }}</p>
+        <p><strong>Address:</strong> {{ profile.address }}, {{ profile.city }}, {{ profile.state }} - {{ profile.pincode }}</p>
+        <p><strong>Father/Husband Name:</strong> {{ profile.father_husband_name }}</p>
+        <p><strong>Education:</strong> {{ profile.education_level }}{% if profile.education_other %} ({{ profile.education_other }}){% endif %}</p>
+        <p><strong>Preferred Location:</strong> {{ profile.preferred_location1 }}{% if profile.preferred_location2 %}, {{ profile.preferred_location2 }}{% endif %}{% if profile.preferred_location3 %}, {{ profile.preferred_location3 }}{% endif %}</p>
+        <p><strong>Employment Type:</strong> {{ profile.employment_type }}</p>
+        <p><strong>Skills:</strong> {{ profile.skills or 'None' }}</p>
+        {% if profile.profile_pic %}
+            <p><strong>Profile Picture:</strong><br>
+            <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" style="max-width: 200px;"></p>
+        {% endif %}
+        {% if profile.aadhar_card %}
+            <p><strong>Aadhaar Card:</strong><br>
+            <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" style="max-width: 200px;"></p>
+        {% endif %}
+        <p><strong>Status:</strong> 
+            {% if profile.verified %}
+                <span class="badge bg-success">Approved</span>
+            {% else %}
+                <span class="badge bg-warning">Pending</span>
+                <a href="{{ url_for('admin_approve', profile_id=profile.id) }}" class="btn btn-success btn-sm">Approve Now</a>
+            {% endif %}
+        </p>
+    </div>
+</body>
+</html>
