@@ -3,18 +3,15 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from config import Config
 from models import db, JobSeekerProfile
 
-# Create a new Flask app for admin
 admin_app = Flask(__name__, template_folder='admin_templates')
 admin_app.config.from_object(Config)
 admin_app.secret_key = 'admin-secret-key-change-me'
 
 db.init_app(admin_app)
 
-# Admin credentials
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'admin123'
 
-# ---- Login required decorator ----
 def login_required_admin(f):
     from functools import wraps
     @wraps(f)
@@ -25,13 +22,11 @@ def login_required_admin(f):
         return f(*args, **kwargs)
     return decorated
 
-# ---- Root redirect ----
 @admin_app.route('/')
 def root():
     return redirect(url_for('admin_login'))
 
-# ---- Admin routes ----
-@admin_app.route('/admin/login', methods=['GET', 'POST'])
+@admin_app.route('/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -43,13 +38,13 @@ def admin_login():
         flash('Invalid credentials.', 'danger')
     return render_template('admin_login.html')
 
-@admin_app.route('/admin/logout')
+@admin_app.route('/logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
     flash('Logged out.', 'info')
     return redirect(url_for('admin_login'))
 
-@admin_app.route('/admin')
+@admin_app.route('/dashboard')
 @login_required_admin
 def admin_dashboard():
     pending_profiles = JobSeekerProfile.query.filter_by(verified=False).all()
@@ -58,13 +53,13 @@ def admin_dashboard():
                            pending=pending_profiles,
                            approved=approved_profiles)
 
-@admin_app.route('/admin/view/<int:profile_id>')
+@admin_app.route('/view/<int:profile_id>')
 @login_required_admin
 def admin_view_profile(profile_id):
     profile = JobSeekerProfile.query.get_or_404(profile_id)
     return render_template('admin_view_profile.html', profile=profile)
 
-@admin_app.route('/admin/approve/<int:profile_id>')
+@admin_app.route('/approve/<int:profile_id>')
 @login_required_admin
 def admin_approve(profile_id):
     profile = JobSeekerProfile.query.get_or_404(profile_id)
@@ -72,8 +67,3 @@ def admin_approve(profile_id):
     db.session.commit()
     flash(f'Profile of {profile.first_name} {profile.last_name} has been approved.', 'success')
     return redirect(url_for('admin_dashboard'))
-
-if __name__ == '__main__':
-    with admin_app.app_context():
-        db.create_all()
-    admin_app.run(debug=True, host='0.0.0.0', port=5001)

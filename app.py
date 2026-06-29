@@ -8,6 +8,8 @@ from wtforms.validators import DataRequired
 from config import Config
 from models import db, User, JobSeekerProfile, EmployerProfile
 from forms import LoginForm, SignupForm, ProfileForm, EmployerForm, INDIAN_CITIES, SKILLS_CHOICES
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from admin import admin_app  # make sure admin.py is importable
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -324,6 +326,13 @@ def about():
 @app.errorhandler(404)
 def not_found(e):
     return render_template('base.html', content='Page not found'), 404
+
+
+
+# Mount the admin app under /admin
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    '/admin': admin_app
+})
 
 if __name__ == '__main__':
     with app.app_context():
