@@ -298,9 +298,20 @@ def hire_dashboard():
         flash('Please complete your business profile first.', 'warning')
         return redirect(url_for('employer_profile'))
 
-    # Only show verified jobseekers
+    # Check if employer is verified
+    if not employer_profile.verified:
+        return redirect(url_for('verification_pending'))
+
     profiles = JobSeekerProfile.query.filter_by(verified=True).all()
     return render_template('hire_dashboard.html', profiles=profiles)
+
+
+@app.route('/verification-pending')
+@login_required
+@role_required('employer')
+def verification_pending():
+    return render_template('verification_pending.html')
+
 @app.route('/view/<int:profile_id>')
 @login_required
 @role_required('employer')

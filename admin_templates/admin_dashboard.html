@@ -19,7 +19,9 @@
             {% endfor %}
         {% endwith %}
 
-        <h3>Pending Profiles ({{ pending|length }})</h3>
+        <!-- ===== JOBSEEKERS ===== -->
+        <h2 class="mb-3"><i class="fas fa-users"></i> Jobseekers</h2>
+        <h4>Pending Profiles ({{ pending_jobseekers|length }})</h4>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -30,23 +32,23 @@
                 </tr>
             </thead>
             <tbody>
-                {% for p in pending %}
+                {% for p in pending_jobseekers %}
                 <tr>
                     <td>{{ p.first_name }} {{ p.last_name }}</td>
                     <td>{{ p.city }}</td>
                     <td>{{ p.created_at.strftime('%Y-%m-%d') }}</td>
                     <td>
-                        <a href="{{ url_for('admin_view_profile', profile_id=p.id) }}" class="btn btn-sm btn-info">View</a>
-                        <a href="{{ url_for('admin_approve', profile_id=p.id) }}" class="btn btn-sm btn-success">Approve</a>
+                        <a href="{{ url_for('admin_view_jobseeker', profile_id=p.id) }}" class="btn btn-sm btn-info">View</a>
+                        <a href="{{ url_for('admin_approve_jobseeker', profile_id=p.id) }}" class="btn btn-sm btn-success">Approve</a>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="4">No pending profiles.</td></tr>
+                <tr><td colspan="4">No pending jobseeker profiles.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <h3 class="mt-4">Approved Profiles ({{ approved|length }})</h3>
+        <h4 class="mt-4">Approved Profiles ({{ approved_jobseekers|length }})</h4>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -57,17 +59,72 @@
                 </tr>
             </thead>
             <tbody>
-                {% for p in approved %}
+                {% for p in approved_jobseekers %}
                 <tr>
                     <td>{{ p.first_name }} {{ p.last_name }}</td>
                     <td>{{ p.city }}</td>
                     <td>{{ p.created_at.strftime('%Y-%m-%d') }}</td>
                     <td>
-                        <a href="{{ url_for('admin_view_profile', profile_id=p.id) }}" class="btn btn-sm btn-info">View</a>
+                        <a href="{{ url_for('admin_view_jobseeker', profile_id=p.id) }}" class="btn btn-sm btn-info">View</a>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="4">No approved profiles yet.</td></tr>
+                <tr><td colspan="4">No approved jobseeker profiles yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- ===== EMPLOYERS ===== -->
+        <h2 class="mt-5 mb-3"><i class="fas fa-building"></i> Employers</h2>
+        <h4>Pending Profiles ({{ pending_employers|length }})</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Business Name</th>
+                    <th>City</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pending_employers %}
+                <tr>
+                    <td>{{ p.business_name }}</td>
+                    <td>{{ p.city }}</td>
+                    <td>{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <a href="{{ url_for('admin_view_employer', profile_id=p.id) }}" class="btn btn-sm btn-info">View</a>
+                        <a href="{{ url_for('admin_approve_employer', profile_id=p.id) }}" class="btn btn-sm btn-success">Approve</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">No pending employer profiles.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h4 class="mt-4">Approved Profiles ({{ approved_employers|length }})</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Business Name</th>
+                    <th>City</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in approved_employers %}
+                <tr>
+                    <td>{{ p.business_name }}</td>
+                    <td>{{ p.city }}</td>
+                    <td>{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <a href="{{ url_for('admin_view_employer', profile_id=p.id) }}" class="btn btn-sm btn-info">View</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">No approved employer profiles yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from config import Config
-from models import db, JobSeekerProfile
+from models import db, JobSeekerProfile, EmployerProfile
 
 admin_app = Flask(__name__, template_folder='admin_templates')
 admin_app.config.from_object(Config)
@@ -47,23 +47,48 @@ def admin_logout():
 @admin_app.route('/dashboard')
 @login_required_admin
 def admin_dashboard():
-    pending_profiles = JobSeekerProfile.query.filter_by(verified=False).all()
-    approved_profiles = JobSeekerProfile.query.filter_by(verified=True).all()
+    # Jobseekers
+    pending_jobseekers = JobSeekerProfile.query.filter_by(verified=False).all()
+    approved_jobseekers = JobSeekerProfile.query.filter_by(verified=True).all()
+
+    # Employers
+    pending_employers = EmployerProfile.query.filter_by(verified=False).all()
+    approved_employers = EmployerProfile.query.filter_by(verified=True).all()
+
     return render_template('admin_dashboard.html',
-                           pending=pending_profiles,
-                           approved=approved_profiles)
+                           pending_jobseekers=pending_jobseekers,
+                           approved_jobseekers=approved_jobseekers,
+                           pending_employers=pending_employers,
+                           approved_employers=approved_employers)
 
-@admin_app.route('/view/<int:profile_id>')
+# ---- Jobseeker routes (existing) ----
+@admin_app.route('/view/jobseeker/<int:profile_id>')
 @login_required_admin
-def admin_view_profile(profile_id):
+def admin_view_jobseeker(profile_id):
     profile = JobSeekerProfile.query.get_or_404(profile_id)
-    return render_template('admin_view_profile.html', profile=profile)
+    return render_template('admin_view_jobseeker.html', profile=profile)
 
-@admin_app.route('/approve/<int:profile_id>')
+@admin_app.route('/approve/jobseeker/<int:profile_id>')
 @login_required_admin
-def admin_approve(profile_id):
+def admin_approve_jobseeker(profile_id):
     profile = JobSeekerProfile.query.get_or_404(profile_id)
     profile.verified = True
     db.session.commit()
-    flash(f'Profile of {profile.first_name} {profile.last_name} has been approved.', 'success')
+    flash(f'Jobseeker {profile.first_name} {profile.last_name} has been approved.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+# ---- Employer routes (new) ----
+@admin_app.route('/view/employer/<int:profile_id>')
+@login_required_admin
+def admin_view_employer(profile_id):
+    profile = EmployerProfile.query.get_or_404(profile_id)
+    return render_template('admin_view_employer.html', profile=profile)
+
+@admin_app.route('/approve/employer/<int:profile_id>')
+@login_required_admin
+def admin_approve_employer(profile_id):
+    profile = EmployerProfile.query.get_or_404(profile_id)
+    profile.verified = True
+    db.session.commit()
+    flash(f'Employer {profile.business_name} has been approved.', 'success')
     return redirect(url_for('admin_dashboard'))

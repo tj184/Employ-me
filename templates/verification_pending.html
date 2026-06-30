@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card-modern p-5 text-center">
+            <i class="fas fa-clock fa-4x mb-3" style="color: var(--accent-gold);"></i>
+            <h2 style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+                Verification Pending
+            </h2>
+            <p class="lead mt-3 text-secondary">
+                Your business profile is currently under review by our admin team.
+            </p>
+            <p class="text-secondary">
+                Once verified, you will be able to browse and hire candidates.
+            </p>
+            <p class="text-secondary small">
+                You can edit your contact details and date of birth while you wait.
+            </p>
+            <a href="{{ url_for('employer_profile') }}" class="btn btn-outline-soft mt-3">
+                <i class="fas fa-building me-2"></i> View / Edit Business Profile
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
