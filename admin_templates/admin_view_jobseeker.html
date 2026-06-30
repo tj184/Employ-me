@@ -38,7 +38,7 @@
                 <span class="badge bg-success">Approved</span>
             {% else %}
                 <span class="badge bg-warning">Pending</span>
-                <a href="{{ url_for('admin_approve', profile_id=profile.id) }}" class="btn btn-success btn-sm">Approve Now</a>
+                <a href="{{ url_for('admin_approve_jobseeker', profile_id=profile.id) }}" class="btn btn-success btn-sm">Approve Now</a>
             {% endif %}
         </p>
     </div>
