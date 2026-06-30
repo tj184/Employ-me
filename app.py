@@ -236,34 +236,59 @@ def employer_profile():
     profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
     form = EmployerForm(obj=profile)
 
+    # Locked fields after first save (everything except contact details and DOB)
+    locked_fields = [
+        'business_name', 'business_address', 'gst_number', 'business_type',
+        'city', 'state', 'pincode'
+    ] if profile else []
+
+    # Remove DataRequired validators from locked fields
+    if profile:
+        for field_name in locked_fields:
+            field = getattr(form, field_name, None)
+            if field:
+                field.validators = [v for v in field.validators if not isinstance(v, DataRequired)]
+
     if form.validate_on_submit():
         if not profile:
             profile = EmployerProfile(user_id=current_user.id)
             db.session.add(profile)
 
-        profile.business_name = form.business_name.data
-        profile.business_address = form.business_address.data
-        profile.gst_number = form.gst_number.data
-        profile.business_type = form.business_type.data
+            # New profile → assign all business fields (locked fields)
+            profile.business_name = form.business_name.data
+            profile.business_address = form.business_address.data
+            profile.gst_number = form.gst_number.data
+            profile.business_type = form.business_type.data
+            profile.city = form.city.data
+            profile.state = form.state.data
+            profile.pincode = form.pincode.data
+
+        # Always editable fields
         profile.contact_person_name = form.contact_person_name.data
         profile.contact_person_phone = form.contact_person_phone.data
-        profile.dob = form.dob.data           # <-- save DOB
+        profile.dob = form.dob.data
 
         db.session.commit()
         flash('Business profile saved!', 'success')
         return redirect(url_for('hire_dashboard'))
 
+    # Pre-populate form for GET
     if profile:
         form.business_name.data = profile.business_name
         form.business_address.data = profile.business_address
         form.gst_number.data = profile.gst_number
         form.business_type.data = profile.business_type
+        form.city.data = profile.city
+        form.state.data = profile.state
+        form.pincode.data = profile.pincode
         form.contact_person_name.data = profile.contact_person_name
         form.contact_person_phone.data = profile.contact_person_phone
-        form.dob.data = profile.dob           # <-- pre-populate DOB
+        form.dob.data = profile.dob
 
-    return render_template('employer_profile.html', form=form, profile=profile)
-
+    return render_template('employer_profile.html',
+                           form=form,
+                           profile=profile,
+                           locked_fields=locked_fields)
 @app.route('/hire')
 @login_required
 @role_required('employer')

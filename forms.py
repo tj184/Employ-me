@@ -221,4 +221,10 @@ class EmployerForm(FlaskForm):
     contact_person_name = StringField('Contact Person Name', validators=[DataRequired(), Length(max=100)])
     contact_person_phone = StringField('Contact Person Phone', validators=[DataRequired(), Length(max=15)])
     dob = DateField('Date of Birth (for verification)', validators=[DataRequired()], format='%Y-%m-%d')
+
+    # New location fields (mandatory)
+    city = StringField('City', validators=[DataRequired(), Length(max=100)])
+    state = StringField('State', validators=[DataRequired(), Length(max=100)])
+    pincode = StringField('Pincode', validators=[DataRequired(), validate_pincode])
+
     submit = SubmitField('Save Business Profile')

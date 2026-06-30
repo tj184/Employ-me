@@ -70,9 +70,15 @@ class EmployerProfile(db.Model):
     contact_person_name = db.Column(db.String(100), nullable=False)
     contact_person_phone = db.Column(db.String(15), nullable=False)
 
+    # New location fields
+    city = db.Column(db.String(100), nullable=False, default='')
+    state = db.Column(db.String(100), nullable=False, default='')
+    pincode = db.Column(db.String(10), nullable=False, default='')
+
     # For identity verification (account deletion)
     dob = db.Column(db.Date, nullable=False, default=date.today)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Verified by admin (employer cannot change this)
+    verified = db.Column(db.Boolean, default=False, nullable=False)
 
-    # No explicit `user` relationship here – it's created by the backref in User
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -13,40 +13,96 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card-modern p-4">
-            <form method="POST" novalidate>
+            <form method="POST" id="employer-profile-form" novalidate>
                 {{ form.hidden_tag() }}
 
-                <h5 class="section-title"><i class="fas fa-building me-2"></i>Business Details</h5>
+                <h5 class="section-title">
+                    <i class="fas fa-building me-2"></i>Business Details
+                    {% if locked_fields %}<small class="text-warning">(locked after saving)</small>{% endif %}
+                </h5>
 
+                <!-- Business Name -->
                 <div class="mb-3">
                     <label class="form-label-custom">
                         {{ form.business_name.label.text }} <span class="text-danger">*</span>
                     </label>
-                    {{ form.business_name(class="form-control-dark", placeholder="Enter your business name") }}
+                    {% if 'business_name' in locked_fields %}
+                        <input class="form-control-dark" value="{{ form.business_name.data or '' }}" readonly>
+                    {% else %}
+                        {{ form.business_name(class="form-control-dark", placeholder="Enter your business name") }}
+                    {% endif %}
                     {% for err in form.business_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
 
+                <!-- Business Address -->
                 <div class="mb-3">
                     <label class="form-label-custom">
                         {{ form.business_address.label.text }} <span class="text-danger">*</span>
                     </label>
-                    {{ form.business_address(class="form-control-dark", rows=3, placeholder="Full business address") }}
+                    {% if 'business_address' in locked_fields %}
+                        <textarea class="form-control-dark" rows="3" readonly>{{ form.business_address.data or '' }}</textarea>
+                    {% else %}
+                        {{ form.business_address(class="form-control-dark", rows=3, placeholder="Full business address") }}
+                    {% endif %}
                     {% for err in form.business_address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
+                <div class="row g-3 mt-2">
+    <div class="col-md-4">
+        <label class="form-label-custom">
+            {{ form.city.label.text }} <span class="text-danger">*</span>
+        </label>
+        {% if 'city' in locked_fields %}
+            <input class="form-control-dark" value="{{ form.city.data or '' }}" readonly>
+        {% else %}
+            {{ form.city(class="form-control-dark", placeholder="City") }}
+        {% endif %}
+        {% for err in form.city.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label-custom">
+            {{ form.state.label.text }} <span class="text-danger">*</span>
+        </label>
+        {% if 'state' in locked_fields %}
+            <input class="form-control-dark" value="{{ form.state.data or '' }}" readonly>
+        {% else %}
+            {{ form.state(class="form-control-dark", placeholder="State") }}
+        {% endif %}
+        {% for err in form.state.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+    </div>
+    <div class="col-md-4">
+        <label class="form-label-custom">
+            {{ form.pincode.label.text }} <span class="text-danger">*</span>
+        </label>
+        {% if 'pincode' in locked_fields %}
+            <input class="form-control-dark" value="{{ form.pincode.data or '' }}" readonly>
+        {% else %}
+            {{ form.pincode(class="form-control-dark", placeholder="6-digit pincode") }}
+        {% endif %}
+        {% for err in form.pincode.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+    </div>
+</div>
 
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label-custom">
                             {{ form.gst_number.label.text }} <span class="text-danger">*</span>
                         </label>
-                        {{ form.gst_number(class="form-control-dark", placeholder="22AAAAA0000A1Z5") }}
+                        {% if 'gst_number' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.gst_number.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.gst_number(class="form-control-dark", placeholder="22AAAAA0000A1Z5") }}
+                        {% endif %}
                         {% for err in form.gst_number.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6">
                         <label class="form-label-custom">
                             {{ form.business_type.label.text }} <span class="text-danger">*</span>
                         </label>
-                        {{ form.business_type(class="form-select-dark") }}
+                        {% if 'business_type' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.business_type.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.business_type(class="form-select-dark") }}
+                        {% endif %}
                         {% for err in form.business_type.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                 </div>
@@ -68,17 +124,20 @@
                         {{ form.contact_person_phone(class="form-control-dark", placeholder="10-digit mobile number") }}
                         {% for err in form.contact_person_phone.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
-                    <div class="mb-3">
-    <label class="form-label-custom">
-        {{ form.dob.label.text }} <span class="text-danger">*</span>
-    </label>
-    {{ form.dob(class="form-control-dark", type="date") }}
-    {% for err in form.dob.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
-</div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label-custom">
+                        {{ form.dob.label.text }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.dob(class="form-control-dark", type="date") }}
+                    {% for err in form.dob.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
 
                 <div class="mt-4">
-                    {{ form.submit(class="btn btn-primary-gradient px-5") }}
+                    <button type="submit" id="save-btn" class="btn btn-primary-gradient px-5">
+                        <i class="fas fa-save me-2"></i> Save Profile
+                    </button>
                 </div>
             </form>
         </div>
@@ -119,6 +178,13 @@
         color: #fff;
         outline: none;
     }
+    .form-control-dark[readonly],
+    .form-select-dark[readonly] {
+        background: rgba(15, 15, 30, 0.3);
+        border-color: rgba(255, 255, 255, 0.03);
+        color: #94A3B8;
+        cursor: not-allowed;
+    }
     .form-select-dark {
         background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         background-repeat: no-repeat;
@@ -126,4 +192,17 @@
         background-size: 16px 12px;
     }
 </style>
+
+<script>
+// Confirmation before saving
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('employer-profile-form');
+    form.addEventListener('submit', function(e) {
+        if (!confirm('Are you sure you want to save your business profile? Critical business details will be locked after saving.')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
 {% endblock %}
