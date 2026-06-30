@@ -542,56 +542,73 @@
             .dashboard-hero { padding: 32px 0 24px; }
             .dashboard-hero .display-4 { font-size: 1.8rem; }
         }
+        /* Make the hamburger icon bright */
+        .navbar-custom .navbar-toggler {
+    border-color: rgba(168, 85, 247, 0.3);   /* subtle purple border */
+    background: rgba(168, 85, 247, 0.1);      /* slight background highlight */
+}
+        .navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Employ-me logo" />
-            <span>Employ‑me</span>
-        </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2">
-                <!-- About Us link – always visible -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('about') }}">
-                        <i class="fas fa-info-circle me-1"></i> About
-                    </a>
-                </li>
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Employ-me logo" />
+                <span>Employ‑me</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-bars" style="color: var(--primary-light); font-size: 1.5rem;"></i>
+</button>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2">
+                    <!-- Home button (always visible) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <!-- About Us link – always visible -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">
+                            <i class="fas fa-info-circle me-1"></i> About
+                        </a>
+                    </li>
 
-                {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <span class="navbar-text">
-                            <i class="fas fa-user-circle"></i>
-                            {{ current_user.name }}
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn-outline-custom" href="{{ url_for('logout') }}">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">
-                            <i class="fas fa-arrow-right-to-bracket me-1"></i> Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn-primary-custom" href="{{ url_for('signup') }}">
-                            <i class="fas fa-user-plus me-1"></i> Sign Up
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="navbar-text">
+                                <i class="fas fa-user-circle"></i>
+                                {{ current_user.name }}
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-outline-custom" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt me-1"></i> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="fas fa-arrow-right-to-bracket me-1"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-primary-custom" href="{{ url_for('signup') }}">
+                                <i class="fas fa-user-plus me-1"></i> Sign Up
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
     <main>
         <div class="container my-4">
