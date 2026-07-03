@@ -1,7 +1,6 @@
-city,name,review,type
-Mumbai,Rajesh Kumar,"Employ-me helped me find a great sales job within a week! The profile creation was so easy.",jobseeker
-Delhi,Pooja Sharma,"I hired three excellent candidates for my store. The verification process gives me confidence.",employer
-Bangalore,Ankit Patel,"As a jobseeker, I loved the skill selection feature. Got a job matching my exact skills.",jobseeker
-Chennai,Sneha Reddy,"We needed delivery staff urgently. Employ-me connected us with verified candidates quickly.",employer
-Pune,Vikram Joshi,"The best job portal for local jobs. I got hired in my own city without any middleman.",jobseeker
-Hyderabad,Meena Iyer,"Our restaurant found two great cooks. The platform is simple and effective.",employer
+city,name,review,type,email
+Mumbai,Rajesh Kumar,"Employ-me helped me find a great sales job within a week! The profile creation was so easy.",jobseeker,t@gmail.com
+Delhi,Pooja Sharma,"I hired three excellent candidates for my store. The verification process gives me confidence.",employer,r@gmail.com
+Chennai,Sneha Reddy,"We needed delivery staff urgently. Employ-me connected us with verified candidates quickly.",employer,sneha@example.com
+Pune,Vikram Joshi,"The best job portal for local jobs. I got hired in my own city without any middleman.",jobseeker,vikram@example.com
+Hyderabad,Meena Iyer,"Our restaurant found two great cooks. The platform is simple and effective.",employer,meena@example.com

@@ -15,6 +15,11 @@
     <div class="container mt-4">
         <h2>{{ profile.business_name }}</h2>
         <hr>
+        <!-- Profile Picture -->
+        {% if profile.profile_pic %}
+            <p><strong>Business Profile Picture:</strong><br>
+            <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" style="max-width: 200px;"></p>
+        {% endif %}
         <p><strong>Contact Person:</strong> {{ profile.contact_person_name }}</p>
         <p><strong>Phone:</strong> {{ profile.contact_person_phone }}</p>
         <p><strong>Email (User):</strong> {{ profile.user.email }}</p>

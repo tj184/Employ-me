@@ -80,5 +80,7 @@ class EmployerProfile(db.Model):
 
     # Verified by admin (employer cannot change this)
     verified = db.Column(db.Boolean, default=False, nullable=False)
+    # Images
+    profile_pic = db.Column(db.String(200))   # business profile picture
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

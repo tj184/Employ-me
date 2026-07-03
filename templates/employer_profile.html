@@ -13,7 +13,7 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card-modern p-4">
-            <form method="POST" id="employer-profile-form" novalidate>
+            <form method="POST" enctype="multipart/form-data" id="employer-profile-form" novalidate>
                 {{ form.hidden_tag() }}
 
                 <h5 class="section-title">
@@ -46,41 +46,42 @@
                     {% endif %}
                     {% for err in form.business_address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
+
                 <div class="row g-3 mt-2">
-    <div class="col-md-4">
-        <label class="form-label-custom">
-            {{ form.city.label.text }} <span class="text-danger">*</span>
-        </label>
-        {% if 'city' in locked_fields %}
-            <input class="form-control-dark" value="{{ form.city.data or '' }}" readonly>
-        {% else %}
-            {{ form.city(class="form-control-dark", placeholder="City") }}
-        {% endif %}
-        {% for err in form.city.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
-    </div>
-    <div class="col-md-4">
-        <label class="form-label-custom">
-            {{ form.state.label.text }} <span class="text-danger">*</span>
-        </label>
-        {% if 'state' in locked_fields %}
-            <input class="form-control-dark" value="{{ form.state.data or '' }}" readonly>
-        {% else %}
-            {{ form.state(class="form-control-dark", placeholder="State") }}
-        {% endif %}
-        {% for err in form.state.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
-    </div>
-    <div class="col-md-4">
-        <label class="form-label-custom">
-            {{ form.pincode.label.text }} <span class="text-danger">*</span>
-        </label>
-        {% if 'pincode' in locked_fields %}
-            <input class="form-control-dark" value="{{ form.pincode.data or '' }}" readonly>
-        {% else %}
-            {{ form.pincode(class="form-control-dark", placeholder="6-digit pincode") }}
-        {% endif %}
-        {% for err in form.pincode.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
-    </div>
-</div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">
+                            {{ form.city.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'city' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.city.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.city(class="form-control-dark", placeholder="City") }}
+                        {% endif %}
+                        {% for err in form.city.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">
+                            {{ form.state.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'state' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.state.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.state(class="form-control-dark", placeholder="State") }}
+                        {% endif %}
+                        {% for err in form.state.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-custom">
+                            {{ form.pincode.label.text }} <span class="text-danger">*</span>
+                        </label>
+                        {% if 'pincode' in locked_fields %}
+                            <input class="form-control-dark" value="{{ form.pincode.data or '' }}" readonly>
+                        {% else %}
+                            {{ form.pincode(class="form-control-dark", placeholder="6-digit pincode") }}
+                        {% endif %}
+                        {% for err in form.pincode.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
 
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -132,6 +133,20 @@
                     </label>
                     {{ form.dob(class="form-control-dark", type="date") }}
                     {% for err in form.dob.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+
+                <!-- Business Profile Picture (mandatory for new profiles, always editable) -->
+                <div class="mt-4">
+                    <label class="form-label-custom">
+                        {{ form.profile_pic.label.text }}
+                        {% if not profile %}<span class="text-danger">*</span>{% endif %}
+                    </label>
+                    {{ form.profile_pic(class="form-control-dark") }}
+                    {% if profile and profile.profile_pic %}
+                        <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}"
+                             class="img-thumbnail-modern mt-2" width="150" alt="Profile Picture">
+                    {% endif %}
+                    {% for err in form.profile_pic.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
 
                 <div class="mt-4">
@@ -190,6 +205,14 @@
         background-repeat: no-repeat;
         background-position: right 0.75rem center;
         background-size: 16px 12px;
+    }
+    .img-thumbnail-modern {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(20,20,40,0.5);
+        padding: 4px;
+        max-width: 150px;
+        display: block;
     }
 </style>
 

@@ -226,5 +226,6 @@ class EmployerForm(FlaskForm):
     city = StringField('City', validators=[DataRequired(), Length(max=100)])
     state = StringField('State', validators=[DataRequired(), Length(max=100)])
     pincode = StringField('Pincode', validators=[DataRequired(), validate_pincode])
+    profile_pic = FileField('Business Profile Picture (optional)', validators=[FileAllowed(['jpg','png','jpeg'], 'Images only!')])
 
     submit = SubmitField('Save Business Profile')

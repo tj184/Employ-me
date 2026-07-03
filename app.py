@@ -9,7 +9,7 @@ from config import Config
 from models import db, User, JobSeekerProfile, EmployerProfile
 from forms import LoginForm, SignupForm, ProfileForm, EmployerForm, INDIAN_CITIES, SKILLS_CHOICES
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from admin import admin_app  # make sure admin.py is importable
+from admin import admin_app 
 import csv
 
 app = Flask(__name__)
@@ -52,7 +52,7 @@ def role_required(role):
         return wrapper
     return decorator
 
-# ---------- Routes ----------
+
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -235,13 +235,11 @@ def employer_profile():
     profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
     form = EmployerForm(obj=profile)
 
-    # Locked fields after first save (everything except contact details and DOB)
     locked_fields = [
         'business_name', 'business_address', 'gst_number', 'business_type',
         'city', 'state', 'pincode'
     ] if profile else []
 
-    # Remove DataRequired validators from locked fields
     if profile:
         for field_name in locked_fields:
             field = getattr(form, field_name, None)
@@ -249,11 +247,18 @@ def employer_profile():
                 field.validators = [v for v in field.validators if not isinstance(v, DataRequired)]
 
     if form.validate_on_submit():
+        # ---- Extra validation for NEW profiles ----
+        if not profile and not form.profile_pic.data:
+            flash('Business profile picture is required.', 'danger')
+            return render_template('employer_profile.html',
+                                   form=form,
+                                   profile=profile,
+                                   locked_fields=locked_fields)
+
         if not profile:
             profile = EmployerProfile(user_id=current_user.id)
             db.session.add(profile)
 
-            # New profile → assign all business fields (locked fields)
             profile.business_name = form.business_name.data
             profile.business_address = form.business_address.data
             profile.gst_number = form.gst_number.data
@@ -266,6 +271,15 @@ def employer_profile():
         profile.contact_person_name = form.contact_person_name.data
         profile.contact_person_phone = form.contact_person_phone.data
         profile.dob = form.dob.data
+
+        # Profile picture (always updatable)
+        if form.profile_pic.data:
+            old = profile.profile_pic
+            filename = save_image(form.profile_pic.data)
+            if filename:
+                if old and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], old)):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], old))
+                profile.profile_pic = filename
 
         db.session.commit()
         flash('Business profile saved!', 'success')
@@ -368,7 +382,24 @@ def load_testimonials():
         with open('testimonials.csv', newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                testimonials.append(row)
+                email = row.get('email', '').strip()
+                image_file = None
+                if email:
+                    user = User.query.filter_by(email=email).first()
+                    if user:
+                        if user.role == 'jobseeker':
+                            profile = JobSeekerProfile.query.filter_by(user_id=user.id).first()
+                            if profile and profile.profile_pic:
+                                image_file = profile.profile_pic
+                        # For employers, we intentionally do NOT try to get a picture;
+                        # image_file remains None, which triggers the default icon.
+                testimonials.append({
+                    'city': row.get('city', ''),
+                    'name': row.get('name', ''),
+                    'review': row.get('review', ''),
+                    'type': row.get('type', ''),
+                    'image_file': image_file
+                })
     except FileNotFoundError:
         pass
     return testimonials
