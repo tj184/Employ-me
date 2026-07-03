@@ -10,6 +10,7 @@ from models import db, User, JobSeekerProfile, EmployerProfile
 from forms import LoginForm, SignupForm, ProfileForm, EmployerForm, INDIAN_CITIES, SKILLS_CHOICES
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from admin import admin_app  # make sure admin.py is importable
+import csv
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -52,9 +53,7 @@ def role_required(role):
     return decorator
 
 # ---------- Routes ----------
-@app.route('/')
-def index():
-    return render_template('index.html')
+
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -362,6 +361,23 @@ def about():
 @app.errorhandler(404)
 def not_found(e):
     return render_template('base.html', content='Page not found'), 404
+
+def load_testimonials():
+    testimonials = []
+    try:
+        with open('testimonials.csv', newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                testimonials.append(row)
+    except FileNotFoundError:
+        pass
+    return testimonials
+
+@app.route('/')
+def index():
+    testimonials = load_testimonials()
+    return render_template('index.html', testimonials=testimonials)
+
 
 
 
