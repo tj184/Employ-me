@@ -476,6 +476,89 @@ def verify_otp():
 
     return jsonify({'success': False, 'message': 'Invalid OTP or expired'}), 400
 
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'GET':
+        return render_template('forgot_password.html')
+
+    # POST – check email and send OTP
+    email = request.form.get('email', '').strip()
+    if not email:
+        flash('Please enter your email address.', 'danger')
+        return render_template('forgot_password.html')
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('No account found with that email.', 'danger')
+        return render_template('forgot_password.html')
+
+    # Generate OTP and store in session
+    otp = str(random.randint(100000, 999999))
+    session['reset_otp'] = otp
+    session['reset_otp_email'] = email
+    session['reset_otp_expiry'] = time.time() + 300  # 5 minutes
+
+    try:
+        send_otp_email(email, otp)
+        flash('OTP sent to your email. Valid for 5 minutes.', 'success')
+        return redirect(url_for('verify_reset_otp'))
+    except Exception as e:
+        flash('Failed to send OTP. Please try again later.', 'danger')
+        return render_template('forgot_password.html')
+
+
+@app.route('/verify-reset-otp', methods=['GET', 'POST'])
+def verify_reset_otp():
+    if request.method == 'GET':
+        return render_template('verify_reset_otp.html')
+
+    # POST – verify OTP
+    otp = request.form.get('otp', '').strip()
+    if (session.get('reset_otp') == otp and
+        time.time() < session.get('reset_otp_expiry', 0)):
+        # OTP valid – allow password reset
+        session.pop('reset_otp', None)
+        session.pop('reset_otp_expiry', None)
+        session['reset_allowed_email'] = session.get('reset_otp_email')
+        return redirect(url_for('reset_password'))
+    else:
+        flash('Invalid OTP or expired.', 'danger')
+        return render_template('verify_reset_otp.html')
+
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'GET':
+        if not session.get('reset_allowed_email'):
+            flash('Unauthorized access.', 'danger')
+            return redirect(url_for('forgot_password'))
+        return render_template('reset_password.html')
+
+    # POST – set new password
+    if not session.get('reset_allowed_email'):
+        flash('Session expired. Please start again.', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    password = request.form.get('password', '')
+    confirm = request.form.get('confirm_password', '')
+    if not password or len(password) < 8:
+        flash('Password must be at least 8 characters.', 'danger')
+        return render_template('reset_password.html')
+    if password != confirm:
+        flash('Passwords do not match.', 'danger')
+        return render_template('reset_password.html')
+
+    email = session.pop('reset_allowed_email')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('User not found.', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    user.password_hash = generate_password_hash(password)
+    db.session.commit()
+    flash('Password reset successfully. You can now log in.', 'success')
+    return redirect(url_for('login'))
+
 
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
