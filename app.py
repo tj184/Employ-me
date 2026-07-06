@@ -11,6 +11,13 @@ from forms import LoginForm, SignupForm, ProfileForm, EmployerForm, INDIAN_CITIE
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from admin import admin_app 
 import csv
+import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import timedelta
+from flask import jsonify, session
+import requests
+import time
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -78,6 +85,11 @@ def signup():
         return redirect(url_for('index'))
     form = SignupForm()
     if form.validate_on_submit():
+        # ---- New email verification check ----
+        if session.get('email_verified') != form.email.data:
+            flash('Please verify your email before signing up.', 'danger')
+            return render_template('signup.html', form=form)
+
         hashed_pw = generate_password_hash(form.password.data)
         user = User(
             email=form.email.data,
@@ -88,6 +100,8 @@ def signup():
         db.session.add(user)
         db.session.commit()
         login_user(user)
+        # Clear the verified flag after successful signup
+        session.pop('email_verified', None)
         flash('Account created! Complete your profile.', 'success')
         if user.role == 'jobseeker':
             return redirect(url_for('jobseeker_dashboard'))
@@ -409,7 +423,58 @@ def index():
     testimonials = load_testimonials()
     return render_template('index.html', testimonials=testimonials)
 
+def send_otp_email(to_email, otp):
+    api_key = os.environ.get('RESEND_API_KEY')
+    from_email = os.environ.get('EMAIL_USER')
+    if not api_key or not from_email:
+        raise Exception("Resend credentials not configured")
 
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "from": f"Employ-me <{from_email}>",   # You can change "Employ-me" to any name
+            "to": [to_email],
+            "subject": "Employ-me Email Verification OTP",
+            "text": f"Your OTP is {otp}. It is valid for 5 minutes."
+        }
+    )
+    if response.status_code != 200:
+        raise Exception(f"Resend error: {response.text}")
+
+@app.route('/send_otp', methods=['POST'])
+def send_otp():
+    email = request.json.get('email')
+    if not email:
+        return jsonify({'success': False, 'message': 'Email required'}), 400
+    otp = str(random.randint(100000, 999999))
+    session['otp'] = otp
+    session['otp_email'] = email
+    session['otp_expiry'] = time.time() + 300   # 5 minutes from now
+
+    try:
+        send_otp_email(email, otp)
+        return jsonify({'success': True, 'message': 'OTP sent'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/verify_otp', methods=['POST'])
+def verify_otp():
+    data = request.get_json()
+    otp = data.get('otp')
+    email = data.get('email')
+
+    if (session.get('otp') == otp and
+        session.get('otp_email') == email and
+        time.time() < session.get('otp_expiry')):
+        # OTP is valid
+        session.pop('otp', None)
+        session.pop('otp_expiry', None)
+        session['email_verified'] = email
+        return jsonify({'success': True})
+
+    return jsonify({'success': False, 'message': 'Invalid OTP or expired'}), 400
 
 
 # Mount the admin app under /admin

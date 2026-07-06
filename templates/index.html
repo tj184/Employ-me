@@ -13,9 +13,14 @@
                     </a>
                 {% else %}
                     <p class="lead">Discover top talent ready to work.</p>
-                    <a href="{{ url_for('hire_dashboard') }}" class="btn btn-white btn-lg px-5 py-3 mt-3">
-                        <i class="fas fa-search"></i> Find Candidates
-                    </a>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap mt-3">
+                        <a href="{{ url_for('hire_dashboard') }}" class="btn btn-white btn-lg px-5 py-3">
+                            <i class="fas fa-search"></i> Find Candidates
+                        </a>
+                        <a href="{{ url_for('employer_profile') }}" class="btn btn-white btn-lg px-5 py-3">
+                            <i class="fas fa-building"></i> My Information
+                        </a>
+                    </div>
                 {% endif %}
             </div>
         </div>

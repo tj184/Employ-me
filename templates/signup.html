@@ -11,64 +11,72 @@
             <h3 class="text-center mb-4" style="font-family: var(--font-display); font-weight: 700; color: #F8FAFC;">
                 Create Account
             </h3>
-            <form method="POST" novalidate>
+            <form method="POST" id="signup-form" novalidate>
                 {{ form.hidden_tag() }}
+                <meta name="csrf-token" content="{{ form.csrf_token._value() }}">
 
                 <!-- Name -->
                 <div class="mb-3">
-                    <label class="form-label-custom">{{ form.name.label.text }}</label>
+                    <label class="form-label-custom">{{ form.name.label.text }} <span class="text-danger">*</span></label>
                     {{ form.name(class="form-control-dark", placeholder="John Doe") }}
-                    {% for error in form.name.errors %}
-                        <div class="text-danger small mt-1">{{ error }}</div>
-                    {% endfor %}
+                    {% for error in form.name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
 
-                <!-- Email -->
+                <!-- Email + Verification -->
                 <div class="mb-3">
-                    <label class="form-label-custom">{{ form.email.label.text }}</label>
-                    {{ form.email(class="form-control-dark", placeholder="you@example.com") }}
-                    {% for error in form.email.errors %}
-                        <div class="text-danger small mt-1">{{ error }}</div>
-                    {% endfor %}
+                    <label class="form-label-custom">{{ form.email.label.text }} <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        {{ form.email(class="form-control-dark", placeholder="you@example.com", id="email", readonly=false) }}
+                        <button type="button" class="btn btn-sm btn-outline-purple" id="send-otp-btn">
+                            <i class="fas fa-paper-plane"></i> Verify
+                        </button>
+                    </div>
+                    <div id="otp-section" style="display:none;" class="mt-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control-dark" id="otp-input" placeholder="Enter OTP" maxlength="6">
+                            <button type="button" class="btn btn-sm btn-success" id="verify-otp-btn">
+                                <i class="fas fa-check"></i> Confirm OTP
+                            </button>
+                        </div>
+                        <small class="text-secondary">OTP sent to your email. Valid for 5 minutes.</small>
+                    </div>
+                    <div id="email-verified" style="display:none;" class="text-success mt-1">
+                        <i class="fas fa-check-circle"></i> Email verified
+                    </div>
+                    {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
 
                 <!-- Password & Confirm -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label-custom">{{ form.password.label.text }}</label>
+                        <label class="form-label-custom">{{ form.password.label.text }} <span class="text-danger">*</span></label>
                         {{ form.password(class="form-control-dark", placeholder="Min 8 characters", id="password") }}
-                        <!-- Strength bar -->
                         <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                            <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%; border-radius: 10px;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%; border-radius: 10px;"></div>
                         </div>
                         <small id="password-strength-text" class="form-text"></small>
-                        {% for error in form.password.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                        {% endfor %}
+                        {% for error in form.password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label-custom">{{ form.confirm_password.label.text }}</label>
+                        <label class="form-label-custom">{{ form.confirm_password.label.text }} <span class="text-danger">*</span></label>
                         {{ form.confirm_password(class="form-control-dark", placeholder="Repeat password") }}
-                        {% for error in form.confirm_password.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                        {% endfor %}
+                        {% for error in form.confirm_password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
                 <!-- Role -->
                 <div class="mb-4">
-                    <label class="form-label-custom">{{ form.role.label.text }}</label>
-                    {{ form.role(class="form-select-dark") }}
+                    <label class="form-label-custom">{{ form.role.label.text }} <span class="text-danger">*</span></label>
+                    {{ form.role(class="form-select-dark", id="role") }}
+                    {% for error in form.role.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
 
-                {{ form.submit(class="btn btn-primary-gradient w-100 py-2") }}
+                {{ form.submit(class="btn btn-primary-gradient w-100 py-2", id="submit-btn", disabled="disabled") }}
             </form>
 
             <p class="mt-4 mb-0 text-center" style="color: #94A3B8;">
                 Already have an account?
-                <a href="{{ url_for('login') }}" style="color: var(--primary-light); font-weight: 600; text-decoration: none;">
-                    Login
-                </a>
+                <a href="{{ url_for('login') }}" style="color: var(--primary-light); font-weight: 600; text-decoration: none;">Login</a>
             </p>
         </div>
     </div>
@@ -77,16 +85,18 @@
 
 {% block extra_scripts %}
 <style>
-    /* ---- Enhanced label and field visibility (same as login) ---- */
+    /* ============================================================
+       SIGN UP PAGE – Custom field styling (preserved from earlier)
+       ============================================================ */
     .form-label-custom {
         font-weight: 500;
-        color: #E2E8F0;          /* brighter for contrast */
+        color: #E2E8F0;
         margin-bottom: 4px;
-        display: block;           /* ensures consistent left‑alignment */
+        display: block;
     }
 
     .form-control-dark {
-        background: rgba(25, 25, 50, 0.85);   /* more opaque and lighter */
+        background: rgba(25, 25, 50, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 12px;
         color: #F1F5F9;
@@ -107,13 +117,12 @@
     }
 
     .form-control-dark::placeholder {
-        color: #94A3B8;          /* lighter and clearly visible */
+        color: #94A3B8;
         opacity: 0.8;
     }
 
-    /* ---- Role select dropdown with clearly visible arrow ---- */
     .form-select-dark {
-        background: rgba(25, 25, 50, 0.85);    /* match input background */
+        background: rgba(25, 25, 50, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 12px;
         color: #F1F5F9;
@@ -122,13 +131,10 @@
         width: 100%;
         box-sizing: border-box;
         appearance: none;
-        /* Custom arrow – using white stroke for maximum visibility */
         background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         background-repeat: no-repeat;
         background-position: right 0.75rem center;
-        background-size: 18px 14px;   /* slightly larger */
-        transition: all 0.3s ease;
-        /* Prevent text from overlapping the arrow */
+        background-size: 18px 14px;
         padding-right: 2.5rem;
     }
 
@@ -140,21 +146,43 @@
         outline: none;
     }
 
-    /* Ensure the dropdown arrow is always visible even when the select is focused */
     .form-select-dark option {
         background: #1a1a2e;
         color: #F1F5F9;
     }
 
-    /* ---- Password strength text ---- */
-    #password-strength-text {
-        color: rgba(255,255,255,0.5);
-        font-size: 0.8rem;
-        display: block;
-        margin-top: 4px;
+    /* ---- OTP buttons ---- */
+    .btn-outline-purple {
+        color: var(--primary-light);
+        border: 1px solid var(--primary);
+        background: transparent;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    .btn-outline-purple:hover {
+        background: var(--primary);
+        color: #fff;
     }
 
-    /* ---- Extra: keep card glass effect consistent ---- */
+    .input-group .form-control-dark {
+        border-right: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .input-group .btn {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Disabled submit button */
+    #submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
     .card-modern {
         background: rgba(10, 10, 25, 0.7);
         backdrop-filter: blur(8px);
@@ -163,8 +191,36 @@
 </style>
 
 <script>
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+let emailVerified = false;
+
+function checkSubmitReady() {
+    const name = document.querySelector('input[name="name"]').value.trim();
+    const email = document.querySelector('#email').value.trim();
+    const password = document.querySelector('#password').value.trim();
+    const confirm = document.querySelector('input[name="confirm_password"]').value.trim();
+    const role = document.querySelector('#role').value;
+    const submitBtn = document.getElementById('submit-btn');
+
+    if (name && email && password && confirm && role && emailVerified) {
+        submitBtn.disabled = false;
+    } else {
+        submitBtn.disabled = true;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const passwordInput = document.getElementById('password');
+    const nameField = document.querySelector('input[name="name"]');
+    const emailField = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    const confirmField = document.querySelector('input[name="confirm_password"]');
+    const roleField = document.getElementById('role');
+
+    [nameField, emailField, passwordField, confirmField, roleField].forEach(field => {
+        if (field) field.addEventListener('input', checkSubmitReady);
+    });
+
+    // Password strength meter
     const strengthBar = document.getElementById('password-strength-bar');
     const strengthText = document.getElementById('password-strength-text');
 
@@ -201,11 +257,92 @@ document.addEventListener('DOMContentLoaded', function() {
         strengthText.style.color = color;
     }
 
-    passwordInput.addEventListener('keyup', function() {
-        const pwd = passwordInput.value;
+    passwordField.addEventListener('input', function() {
+        const pwd = passwordField.value;
         const score = calculateStrength(pwd);
         updateStrengthIndicator(score);
     });
+
+    // OTP flow
+    const sendOtpBtn = document.getElementById('send-otp-btn');
+    const otpSection = document.getElementById('otp-section');
+    const otpInput = document.getElementById('otp-input');
+    const verifyOtpBtn = document.getElementById('verify-otp-btn');
+    const emailVerifiedDiv = document.getElementById('email-verified');
+
+    sendOtpBtn.addEventListener('click', async function() {
+        const email = emailField.value.trim();
+        if (!email) {
+            alert('Please enter an email address.');
+            return;
+        }
+        sendOtpBtn.disabled = true;
+        sendOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+        try {
+            const res = await fetch('/send_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ email: email })
+            });
+            const data = await res.json();
+            if (data.success) {
+                otpSection.style.display = 'block';
+                sendOtpBtn.style.display = 'none';
+            } else {
+                alert('Failed to send OTP: ' + data.message);
+            }
+        } catch (err) {
+            alert('An error occurred. Please try again.');
+        } finally {
+            sendOtpBtn.disabled = false;
+            sendOtpBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Verify';
+        }
+    });
+
+    verifyOtpBtn.addEventListener('click', async function() {
+        const otp = otpInput.value.trim();
+        if (!otp) {
+            alert('Please enter the OTP.');
+            return;
+        }
+        verifyOtpBtn.disabled = true;
+        verifyOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        try {
+            const res = await fetch('/verify_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ email: emailField.value.trim(), otp: otp })
+            });
+            const data = await res.json();
+            if (data.success) {
+                emailVerified = true;
+                // Set readonly instead of disabled to keep value submitted
+                emailField.setAttribute('readonly', 'readonly');
+                emailField.classList.add('text-muted');
+                otpSection.style.display = 'none';
+                emailVerifiedDiv.style.display = 'block';
+                checkSubmitReady();
+            } else {
+                alert('Invalid OTP or expired.');
+            }
+        } catch (err) {
+            alert('An error occurred.');
+        } finally {
+            verifyOtpBtn.disabled = false;
+            verifyOtpBtn.innerHTML = '<i class="fas fa-check"></i> Confirm OTP';
+        }
+    });
+
+    // Initial check
+    checkSubmitReady();
 });
 </script>
 {% endblock %}
