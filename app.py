@@ -85,10 +85,22 @@ def signup():
         return redirect(url_for('index'))
     form = SignupForm()
     if form.validate_on_submit():
-        # ---- New email verification check ----
+        # ---- reCAPTCHA verification ----
+        token = request.form.get('g-recaptcha-response')
+        if not token:
+            flash('reCAPTCHA token missing. Please refresh and try again.', 'danger')
+            return render_template('signup.html', form=form)
+        valid, error = verify_recaptcha(token)
+        if not valid:
+            flash(error, 'danger')
+            return render_template('signup.html', form=form)
+
+        # ---- existing email verification check ----
         if session.get('email_verified') != form.email.data:
             flash('Please verify your email before signing up.', 'danger')
             return render_template('signup.html', form=form)
+
+        # ... (rest of signup logic unchanged)
 
         hashed_pw = generate_password_hash(form.password.data)
         user = User(
@@ -444,13 +456,25 @@ def send_otp_email(to_email, otp):
 
 @app.route('/send_otp', methods=['POST'])
 def send_otp():
-    email = request.json.get('email')
+    data = request.get_json()
+    email = data.get('email')
+    token = data.get('g-recaptcha-response')   # <-- new
+
     if not email:
         return jsonify({'success': False, 'message': 'Email required'}), 400
+
+    # reCAPTCHA verification
+    if not token:
+        return jsonify({'success': False, 'message': 'reCAPTCHA token missing'}), 400
+    valid, error = verify_recaptcha(token)
+    if not valid:
+        return jsonify({'success': False, 'message': error}), 400
+
+    # OTP logic (unchanged)
     otp = str(random.randint(100000, 999999))
     session['otp'] = otp
     session['otp_email'] = email
-    session['otp_expiry'] = time.time() + 300   # 5 minutes from now
+    session['otp_expiry'] = time.time() + 300
 
     try:
         send_otp_email(email, otp)
@@ -559,6 +583,19 @@ def reset_password():
     flash('Password reset successfully. You can now log in.', 'success')
     return redirect(url_for('login'))
 
+def verify_recaptcha(token):
+    secret = os.environ.get('RECAPTCHA_SECRET_KEY')
+    if not secret:
+        return False, 'reCAPTCHA secret key not configured'
+
+    response = requests.post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        data={'secret': secret, 'response': token}
+    )
+    result = response.json()
+    if result.get('success') and result.get('score', 0) >= 0.5:  # threshold, adjust if needed
+        return True, None
+    return False, 'reCAPTCHA verification failed. Are you a robot?'
 
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
