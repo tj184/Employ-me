@@ -79,7 +79,10 @@
                     {% for error in form.role.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
 
-                {{ form.submit(class="btn btn-primary-gradient w-100 py-2", id="submit-btn", disabled="disabled") }}
+                <!-- Sign‑up button (type="button") -->
+                <button type="button" class="btn btn-primary-gradient w-100 py-2" id="submit-btn" disabled>
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
             </form>
 
             <p class="mt-4 mb-0 text-center" style="color: #94A3B8;">
@@ -93,7 +96,7 @@
 
 {% block extra_scripts %}
 <!-- reCAPTCHA v3 script -->
-<script src="https://www.google.com/recaptcha/api.js?render={{ config['RECAPTCHA_SITE_KEY'] }}" async defer></script>
+<script src="https://www.google.com/recaptcha/api.js?render={{ config['RECAPTCHA_SITE_KEY'] }}"></script>
 
 <style>
     /* ... (all existing styles unchanged) ... */
@@ -210,9 +213,11 @@ const verifyOtpBtn = document.getElementById('verify-otp-btn');
 const emailVerifiedDiv = document.getElementById('email-verified');
 const emailField = document.getElementById('email');
 const recaptchaTokenField = document.getElementById('recaptcha-token');
+const submitBtn = document.getElementById('submit-btn');
+const signupForm = document.getElementById('signup-form');
 
 // reCAPTCHA helper – returns a token
-async function getRecaptchaToken(action = 'send_otp') {
+async function getRecaptchaToken(action = 'signup') {
     try {
         const token = await grecaptcha.execute('{{ config['RECAPTCHA_SITE_KEY'] }}', { action: action });
         return token;
@@ -255,7 +260,6 @@ function checkSubmitReady() {
     const password = document.querySelector('#password').value.trim();
     const confirm = document.querySelector('input[name="confirm_password"]').value.trim();
     const role = document.querySelector('#role').value;
-    const submitBtn = document.getElementById('submit-btn');
     if (name && email && password && confirm && role && emailVerified) {
         submitBtn.disabled = false;
     } else {
@@ -263,6 +267,7 @@ function checkSubmitReady() {
     }
 }
 
+// Attach input listeners
 document.addEventListener('DOMContentLoaded', function() {
     const nameField = document.querySelector('input[name="name"]');
     const passwordField = document.getElementById('password');
@@ -272,8 +277,10 @@ document.addEventListener('DOMContentLoaded', function() {
     [nameField, emailField, passwordField, confirmField, roleField].forEach(field => {
         if (field) field.addEventListener('input', checkSubmitReady);
     });
+    // role change also triggers check
+    roleField.addEventListener('change', checkSubmitReady);
 
-    // Password strength meter
+    // Password strength meter (unchanged)
     const strengthBar = document.getElementById('password-strength-bar');
     const strengthText = document.getElementById('password-strength-text');
 
@@ -324,7 +331,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Get reCAPTCHA token
         const token = await getRecaptchaToken('send_otp');
         if (!token) return;
 
@@ -437,15 +443,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ============ FORM SUBMISSION (with reCAPTCHA) ============
-    const signupForm = document.getElementById('signup-form');
-    signupForm.addEventListener('submit', async function(e) {
-        e.preventDefault();  // We'll handle submission manually
+    // ============ FORM SUBMISSION (via button click) ============
+    submitBtn.addEventListener('click', async function() {
+        if (submitBtn.disabled) return;   // safety check
+
+        // Double‑check all fields are still valid (they should be, because the button is enabled only then)
+        if (!emailVerified) {
+            alert('Please verify your email first.');
+            return;
+        }
+
+        // Get reCAPTCHA token for the "signup" action
         const token = await getRecaptchaToken('signup');
         if (!token) return;
-        // Set the hidden field and submit the form normally
+
+        // Set the hidden token field and submit the form programmatically
         recaptchaTokenField.value = token;
-        signupForm.submit();
+        signupForm.submit();   // this will now send the POST request normally
     });
 
     // Initial check
