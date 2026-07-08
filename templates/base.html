@@ -577,6 +577,18 @@
                             <i class="fas fa-info-circle me-1"></i> About
                         </a>
                     </li>
+                    <!-- Help link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('help') }}">
+                            <i class="fas fa-question-circle me-1"></i> Help
+                        </a>
+                    </li>
+                    <!-- Contact Us link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') }}">
+                            <i class="fas fa-envelope me-1"></i> Contact Us
+                        </a>
+                    </li>
 
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
@@ -636,9 +648,9 @@
                 <div class="col-md-6 text-center text-md-end small">
                     &copy; 2026 Employ‑me – All rights reserved.
                     <span class="mx-2">·</span>
-                    <a href="#" class="text-white-50">Privacy</a>
+                    <!-- Privacy link now triggers a modal -->
+                    <a href="#" class="text-white-50" data-bs-toggle="modal" data-bs-target="#footerPrivacyModal">Privacy</a>
                     <span class="mx-1">·</span>
-                    <!-- Updated Terms link to trigger modal -->
                     <a href="#" class="text-white-50" data-bs-toggle="modal" data-bs-target="#footerTermsModal">Terms</a>
                 </div>
             </div>
@@ -666,6 +678,36 @@
                     <p>Your personal data is handled in accordance with our Privacy Policy. We do not share your information without your consent except as required by law.</p>
                     <h6>6. Termination</h6>
                     <p>We reserve the right to suspend or terminate accounts that violate these terms without prior notice.</p>
+                    <p class="mt-3 text-secondary">Last updated: July 2026</p>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Privacy Policy Modal ===== -->
+    <div class="modal fade" id="footerPrivacyModal" tabindex="-1" aria-labelledby="footerPrivacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content" style="background: rgba(20, 20, 45, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #E2E8F0;">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title" id="footerPrivacyModalLabel" style="font-family: var(--font-display); font-weight: 700;">Privacy Policy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>1. Information We Collect</h6>
+                    <p>We collect information you provide directly, such as your name, email address, and profile details. We also automatically collect certain technical information when you use our service.</p>
+                    <h6>2. How We Use Information</h6>
+                    <p>We use the information to provide, maintain, and improve our services, to communicate with you, and to ensure the security of our platform.</p>
+                    <h6>3. Sharing of Information</h6>
+                    <p>We do not share your personal information with third parties except as necessary to provide the service, comply with the law, or protect our rights.</p>
+                    <h6>4. Data Security</h6>
+                    <p>We implement reasonable security measures to protect your data. However, no method of transmission over the Internet is 100% secure.</p>
+                    <h6>5. Your Choices</h6>
+                    <p>You can update or delete your account at any time. You may also contact us to request access to your personal data.</p>
+                    <h6>6. Changes to This Policy</h6>
+                    <p>We may update this policy from time to time. Continued use of the service after changes constitutes acceptance.</p>
                     <p class="mt-3 text-secondary">Last updated: July 2026</p>
                 </div>
                 <div class="modal-footer border-top-0">

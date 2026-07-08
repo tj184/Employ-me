@@ -618,6 +618,14 @@ def verify_recaptcha(token):
         return True, None
     return False, 'reCAPTCHA verification failed. Are you a robot?'
 
+@app.route('/help')
+def help():
+    return render_template('help.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/admin': admin_app

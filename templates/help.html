@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <div class="text-center mb-3">
+                <i class="fas fa-question-circle fa-2x" style="color: var(--primary-light); opacity: 0.7;"></i>
+            </div>
+            <h2 class="text-center mb-4" style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+                Help <span class="gradient-text">Center</span>
+            </h2>
+
+            <h5 class="section-title"><i class="fas fa-user-graduate me-2" style="color: var(--primary-light);"></i>For Jobseekers</h5>
+            <div class="mb-3">
+                <strong style="color: #E2E8F0;">How do I create a profile?</strong>
+                <p class="text-secondary">After signing up, go to your dashboard and fill in the required details. Your profile will be reviewed by our admin team before becoming visible to employers.</p>
+            </div>
+            <div class="mb-3">
+                <strong style="color: #E2E8F0;">Why can’t I edit some fields after saving?</strong>
+                <p class="text-secondary">To prevent misuse, critical information (name, date of birth, Aadhaar card, etc.) is locked after the first save. You can still update your skills, education, and profile picture.</p>
+            </div>
+
+            <h5 class="section-title"><i class="fas fa-building me-2" style="color: var(--employer-light);"></i>For Employers</h5>
+            <div class="mb-3">
+                <strong style="color: #E2E8F0;">How do I hire candidates?</strong>
+                <p class="text-secondary">Complete your business profile and wait for admin verification. Once approved, you can browse verified jobseeker profiles and contact them directly.</p>
+            </div>
+            <div class="mb-3">
+                <strong style="color: #E2E8F0;">I forgot my password. How can I reset it?</strong>
+                <p class="text-secondary">Click on “Forgot Password?” on the login page, enter your registered email, and follow the OTP verification steps to set a new password.</p>
+            </div>
+
+            <h5 class="section-title"><i class="fas fa-envelope me-2" style="color: var(--accent-gold);"></i>Still need help?</h5>
+            <p class="text-secondary">Visit our <a href="{{ url_for('contact') }}" style="color: var(--primary-light); text-decoration: none;">Contact Us</a> page to get in touch with our support team.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .section-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: var(--text-primary);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 10px;
+        margin-top: 1.5rem;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}

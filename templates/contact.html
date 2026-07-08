@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <div class="text-center mb-3">
+                <i class="fas fa-envelope fa-2x" style="color: var(--primary-light); opacity: 0.7;"></i>
+            </div>
+            <h2 class="text-center mb-4" style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+                Contact <span class="gradient-text">Us</span>
+            </h2>
+            <p class="text-center text-secondary mb-4">We’d love to hear from you. Fill out the form below or reach us directly.</p>
+
+            <form>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">Your Name</label>
+                        <input type="text" class="form-control-dark" placeholder="John Doe">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">Your Email</label>
+                        <input type="email" class="form-control-dark" placeholder="you@example.com">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-custom">Subject</label>
+                    <input type="text" class="form-control-dark" placeholder="How can we help?">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label-custom">Message</label>
+                    <textarea class="form-control-dark" rows="5" placeholder="Write your message..."></textarea>
+                </div>
+                <button type="button" class="btn btn-primary-gradient w-100 py-2">
+                    <i class="fas fa-paper-plane me-2"></i> Send Message
+                </button>
+            </form>
+
+            <hr style="border-color: rgba(255,255,255,0.05);" class="my-4">
+
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <i class="fas fa-map-marker-alt fa-2x mb-2" style="color: var(--employer-light);"></i>
+                    <h6 style="color: #F8FAFC;">Address</h6>
+                    <p class="text-secondary small">123 Business Street, New Delhi, India</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <i class="fas fa-phone fa-2x mb-2" style="color: var(--primary-light);"></i>
+                    <h6 style="color: #F8FAFC;">Phone</h6>
+                    <p class="text-secondary small">+91 98765 43210</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <i class="fas fa-envelope fa-2x mb-2" style="color: var(--accent-gold);"></i>
+                    <h6 style="color: #F8FAFC;">Email</h6>
+                    <p class="text-secondary small">support@employ-me.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .form-label-custom {
+        font-weight: 500;
+        color: #E2E8F0;
+        margin-bottom: 4px;
+        display: block;
+    }
+    .form-control-dark {
+        background: rgba(25, 25, 50, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        color: #F1F5F9;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .form-control-dark:focus {
+        background: rgba(30, 30, 60, 0.9);
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.35), inset 0 2px 4px rgba(0,0,0,0.2);
+        color: #fff;
+        outline: none;
+    }
+    .form-control-dark::placeholder { color: #94A3B8; opacity: 0.8; }
+</style>
+{% endblock %}
