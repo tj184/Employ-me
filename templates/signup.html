@@ -241,6 +241,9 @@ const cooldownSeconds = 78;
 let cooldownInterval = null;
 let cooldownRemaining = 0;
 
+// 🔥 NEW: Store the current password strength score
+let passwordStrengthScore = 0;
+
 // reCAPTCHA helper
 async function getRecaptchaToken(action = 'signup') {
     try {
@@ -279,7 +282,7 @@ function disableResendWithCooldown() {
     }, 1000);
 }
 
-// Check if signup form is ready to submit
+// Check if signup form is ready to submit (now includes password strength)
 function checkSubmitReady() {
     const name = document.querySelector('input[name="name"]').value.trim();
     const email = emailField.value.trim();
@@ -287,7 +290,8 @@ function checkSubmitReady() {
     const confirm = document.querySelector('input[name="confirm_password"]').value.trim();
     const role = document.querySelector('#role').value;
     const termsAccepted = termsCheckbox.checked;
-    if (name && email && password && confirm && role && emailVerified && termsAccepted) {
+    // 🔥 Only allow medium/strong passwords (score >= 3)
+    if (name && email && password && confirm && role && emailVerified && termsAccepted && passwordStrengthScore >= 3) {
         submitBtn.disabled = false;
     } else {
         submitBtn.disabled = true;
@@ -309,7 +313,7 @@ function resetEmailVerification() {
     emailVerified = false;
     emailField.removeAttribute('readonly');
     emailField.classList.remove('form-control-dark-verified');
-    emailField.value = '';  // clear the old email
+    emailField.value = '';
     emailVerifiedDiv.style.display = 'none';
     sendOtpBtn.style.display = 'inline-block';
     otpSection.style.display = 'none';
@@ -337,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resetEmailVerification();
     });
 
-    // Password strength meter (unchanged)
+    // Password strength meter (unchanged, but now stores the score)
     const strengthBar = document.getElementById('password-strength-bar');
     const strengthText = document.getElementById('password-strength-text');
     function calculateStrength(password) {
@@ -361,8 +365,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     passwordField.addEventListener('input', function() {
         const pwd = passwordField.value;
-        const score = calculateStrength(pwd);
-        updateStrengthIndicator(score);
+        passwordStrengthScore = calculateStrength(pwd);   // 🔥 update global score
+        updateStrengthIndicator(passwordStrengthScore);
+        checkSubmitReady();   // re-evaluate button state immediately
     });
 
     // ===== OTP SEND =====
@@ -475,6 +480,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (submitBtn.disabled) return;
         if (!emailVerified) { alert('Please verify your email first.'); return; }
         if (!termsCheckbox.checked) { alert('You must agree to the Terms and Conditions.'); return; }
+        // 🔥 Final safety check – password must be at least medium strength
+        if (passwordStrengthScore < 3) {
+            alert('Please choose a stronger password (at least Medium strength).');
+            return;
+        }
 
         const token = await getRecaptchaToken('signup');
         if (!token) return;
