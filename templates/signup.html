@@ -14,7 +14,6 @@
             <form method="POST" id="signup-form" novalidate>
                 {{ form.hidden_tag() }}
                 <meta name="csrf-token" content="{{ form.csrf_token._value() }}">
-                <!-- Hidden reCAPTCHA token field -->
                 <input type="hidden" name="g-recaptcha-response" id="recaptcha-token">
 
                 <!-- Name -->
@@ -79,6 +78,15 @@
                     {% for error in form.role.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
 
+                <!-- Terms and Conditions Checkbox -->
+                <div class="mb-3 form-check-dark d-flex align-items-center">
+                    <input class="form-check-input me-2" type="checkbox" id="terms-checkbox" style="width: 18px; height: 18px;">
+                    <label class="form-check-label" for="terms-checkbox" style="color: #CBD5E1; font-size: 0.9rem;">
+                        I agree to the 
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" style="color: var(--primary-light); text-decoration: underline;">Terms and Conditions</a>
+                    </label>
+                </div>
+
                 <!-- Sign‑up button (type="button") -->
                 <button type="button" class="btn btn-primary-gradient w-100 py-2" id="submit-btn" disabled>
                     <i class="fas fa-user-plus"></i> Sign Up
@@ -89,6 +97,42 @@
                 Already have an account?
                 <a href="{{ url_for('login') }}" style="color: var(--primary-light); font-weight: 600; text-decoration: none;">Login</a>
             </p>
+        </div>
+    </div>
+</div>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content" style="background: rgba(20, 20, 45, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #E2E8F0;">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="termsModalLabel" style="font-family: var(--font-display); font-weight: 700;">Terms and Conditions</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Acceptance of Terms</h6>
+                <p>By creating an account, you agree to be bound by these terms. If you do not agree, do not use the service.</p>
+                
+                <h6>2. Account Registration</h6>
+                <p>You must provide accurate and complete information during registration. You are responsible for maintaining the confidentiality of your account credentials.</p>
+                
+                <h6>3. Email Verification</h6>
+                <p>You agree to verify your email address using the OTP sent to you. Only verified accounts are permitted to use the platform.</p>
+                
+                <h6>4. User Conduct</h6>
+                <p>You agree not to misuse the platform, including but not limited to: spamming, impersonation, uploading illegal content, or attempting to bypass security measures.</p>
+                
+                <h6>5. Privacy</h6>
+                <p>Your personal data is handled in accordance with our Privacy Policy. We do not share your information without your consent except as required by law.</p>
+                
+                <h6>6. Termination</h6>
+                <p>We reserve the right to suspend or terminate accounts that violate these terms without prior notice.</p>
+                
+                <p class="mt-3 text-secondary">Last updated: July 2026</p>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -192,6 +236,15 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+    /* Terms checkbox styling */
+    .form-check-dark .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+    .form-check-dark .form-check-input {
+        background-color: rgba(15, 15, 30, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 </style>
 
 <script>
@@ -215,6 +268,7 @@ const emailField = document.getElementById('email');
 const recaptchaTokenField = document.getElementById('recaptcha-token');
 const submitBtn = document.getElementById('submit-btn');
 const signupForm = document.getElementById('signup-form');
+const termsCheckbox = document.getElementById('terms-checkbox');  // NEW
 
 // reCAPTCHA helper – returns a token
 async function getRecaptchaToken(action = 'signup') {
@@ -260,7 +314,8 @@ function checkSubmitReady() {
     const password = document.querySelector('#password').value.trim();
     const confirm = document.querySelector('input[name="confirm_password"]').value.trim();
     const role = document.querySelector('#role').value;
-    if (name && email && password && confirm && role && emailVerified) {
+    const termsAccepted = termsCheckbox.checked;   // NEW
+    if (name && email && password && confirm && role && emailVerified && termsAccepted) {
         submitBtn.disabled = false;
     } else {
         submitBtn.disabled = true;
@@ -274,10 +329,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmField = document.querySelector('input[name="confirm_password"]');
     const roleField = document.getElementById('role');
 
-    [nameField, emailField, passwordField, confirmField, roleField].forEach(field => {
+    [nameField, emailField, passwordField, confirmField, roleField, termsCheckbox].forEach(field => {
         if (field) field.addEventListener('input', checkSubmitReady);
     });
-    // role change also triggers check
+    // For checkbox, also listen to change event
+    termsCheckbox.addEventListener('change', checkSubmitReady);
     roleField.addEventListener('change', checkSubmitReady);
 
     // Password strength meter (unchanged)
@@ -445,21 +501,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ============ FORM SUBMISSION (via button click) ============
     submitBtn.addEventListener('click', async function() {
-        if (submitBtn.disabled) return;   // safety check
+        if (submitBtn.disabled) return;
 
-        // Double‑check all fields are still valid (they should be, because the button is enabled only then)
         if (!emailVerified) {
             alert('Please verify your email first.');
             return;
         }
+        if (!termsCheckbox.checked) {
+            alert('You must agree to the Terms and Conditions.');
+            return;
+        }
 
-        // Get reCAPTCHA token for the "signup" action
         const token = await getRecaptchaToken('signup');
         if (!token) return;
 
-        // Set the hidden token field and submit the form programmatically
         recaptchaTokenField.value = token;
-        signupForm.submit();   // this will now send the POST request normally
+        signupForm.submit();
     });
 
     // Initial check
