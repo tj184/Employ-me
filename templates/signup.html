@@ -48,6 +48,9 @@
                     </div>
                     <div id="email-verified" style="display:none;" class="text-success mt-1">
                         <i class="fas fa-check-circle"></i> Email verified
+                        <button type="button" class="btn btn-sm btn-link text-warning ms-2 p-0" id="change-email-btn" style="font-size: 0.8rem;">
+                            Change Email
+                        </button>
                     </div>
                     {% for error in form.email.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                 </div>
@@ -196,13 +199,23 @@
     .form-control-dark[readonly] {
         background: rgba(15, 15, 30, 0.4);
         border-color: rgba(255, 255, 255, 0.08);
-        color: #CBD5E1 !important;   /* lighter, clearly visible */
+        color: #CBD5E1 !important;
         cursor: not-allowed;
+    }
+
+    /* "Change Email" button style */
+    #change-email-btn {
+        color: var(--accent-gold);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    #change-email-btn:hover {
+        color: var(--accent-gold-dark);
+        text-decoration: underline;
     }
 </style>
 
 <script>
-// 1️⃣ Grab CSRF token and pre-verified flag from server
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 let emailVerified = {{ 'true' if email_preverified else 'false' }};
 
@@ -215,6 +228,7 @@ const verifyOtpBtn = document.getElementById('verify-otp-btn');
 const resendOtpBtn = document.getElementById('resend-otp-btn');
 const resendCountdown = document.getElementById('resend-countdown');
 const emailVerifiedDiv = document.getElementById('email-verified');
+const changeEmailBtn = document.getElementById('change-email-btn');
 const termsCheckbox = document.getElementById('terms-checkbox');
 const submitBtn = document.getElementById('submit-btn');
 const signupForm = document.getElementById('signup-form');
@@ -280,14 +294,27 @@ function checkSubmitReady() {
     }
 }
 
-// Restore verified state on page load (if server says it's already verified)
+// Restore verified state on page load
 function applyVerifiedState() {
     if (emailVerified) {
         emailField.setAttribute('readonly', 'readonly');
-        emailField.classList.add('form-control-dark-verified');  // custom class for styling
+        emailField.classList.add('form-control-dark-verified');
         emailVerifiedDiv.style.display = 'block';
         sendOtpBtn.style.display = 'none';
     }
+}
+
+// Reset verification state (for Change Email)
+function resetEmailVerification() {
+    emailVerified = false;
+    emailField.removeAttribute('readonly');
+    emailField.classList.remove('form-control-dark-verified');
+    emailField.value = '';  // clear the old email
+    emailVerifiedDiv.style.display = 'none';
+    sendOtpBtn.style.display = 'inline-block';
+    otpSection.style.display = 'none';
+    otpInput.value = '';
+    checkSubmitReady();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -303,6 +330,12 @@ document.addEventListener('DOMContentLoaded', function() {
     roleField.addEventListener('change', checkSubmitReady);
 
     applyVerifiedState();
+
+    // Change Email button
+    changeEmailBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetEmailVerification();
+    });
 
     // Password strength meter (unchanged)
     const strengthBar = document.getElementById('password-strength-bar');
@@ -357,7 +390,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 resendCount = 0;
                 disableResendWithCooldown();
             } else {
-                // Show specific error (e.g., already registered)
                 alert('Failed to send OTP: ' + data.message);
             }
         } catch (err) {
