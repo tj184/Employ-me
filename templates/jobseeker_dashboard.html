@@ -172,18 +172,24 @@
                         <label class="form-label-custom">
                             {{ form.preferred_location1.label.text }} <span class="text-danger">*</span>
                         </label>
-                        {{ form.preferred_location1(class="form-select-dark") }}
+                        {{ form.preferred_location1(class="form-control-dark", list="city-list", autocomplete="off") }}
                         {% for err in form.preferred_location1.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-custom">{{ form.preferred_location2.label.text }}</label>
-                        {{ form.preferred_location2(class="form-select-dark") }}
+                        {{ form.preferred_location2(class="form-control-dark", list="city-list", autocomplete="off") }}
                     </div>
                     <div class="col-md-4">
                         <label class="form-label-custom">{{ form.preferred_location3.label.text }}</label>
-                        {{ form.preferred_location3(class="form-select-dark") }}
+                        {{ form.preferred_location3(class="form-control-dark", list="city-list", autocomplete="off") }}
                     </div>
                 </div>
+                <!-- Datalist with all Indian cities -->
+                <datalist id="city-list">
+                    {% for city in cities %}
+                        <option value="{{ city }}">{{ city }}</option>
+                    {% endfor %}
+                </datalist>
                 <div class="mt-3">
                     <label class="form-label-custom">{{ form.employment_type.label.text }}</label>
                     {{ form.employment_type(class="form-select-dark") }}
@@ -226,7 +232,6 @@
                             {% if 'aadhar_card' not in locked_fields %}<span class="text-danger">*</span>{% endif %}
                         </label>
                         {% if 'aadhar_card' in locked_fields %}
-                            <!-- Already locked – show image only -->
                             {% if profile and profile.aadhar_card %}
                                 <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" class="img-thumbnail-modern d-block" width="150">
                             {% else %}
