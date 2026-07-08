@@ -3,7 +3,6 @@
 {% block content %}
 <div class="row justify-content-center mt-4">
     <div class="col-md-6 col-lg-5">
-        <!-- Glass card -->
         <div class="card-modern p-4">
             <div class="text-center mb-3">
                 <i class="fas fa-user-plus fa-2x" style="color: var(--primary-light); opacity: 0.7;"></i>
@@ -82,7 +81,7 @@
                 <div class="mb-3 form-check-dark d-flex align-items-center">
                     <input class="form-check-input me-2" type="checkbox" id="terms-checkbox" style="width: 18px; height: 18px;">
                     <label class="form-check-label" for="terms-checkbox" style="color: #CBD5E1; font-size: 0.9rem;">
-                        I agree to the 
+                        I agree to the
                         <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" style="color: var(--primary-light); text-decoration: underline;">Terms and Conditions</a>
                     </label>
                 </div>
@@ -112,22 +111,16 @@
             <div class="modal-body">
                 <h6>1. Acceptance of Terms</h6>
                 <p>By creating an account, you agree to be bound by these terms. If you do not agree, do not use the service.</p>
-                
                 <h6>2. Account Registration</h6>
                 <p>You must provide accurate and complete information during registration. You are responsible for maintaining the confidentiality of your account credentials.</p>
-                
                 <h6>3. Email Verification</h6>
                 <p>You agree to verify your email address using the OTP sent to you. Only verified accounts are permitted to use the platform.</p>
-                
                 <h6>4. User Conduct</h6>
                 <p>You agree not to misuse the platform, including but not limited to: spamming, impersonation, uploading illegal content, or attempting to bypass security measures.</p>
-                
                 <h6>5. Privacy</h6>
                 <p>Your personal data is handled in accordance with our Privacy Policy. We do not share your information without your consent except as required by law.</p>
-                
                 <h6>6. Termination</h6>
                 <p>We reserve the right to suspend or terminate accounts that violate these terms without prior notice.</p>
-                
                 <p class="mt-3 text-secondary">Last updated: July 2026</p>
             </div>
             <div class="modal-footer border-top-0">
@@ -143,13 +136,8 @@
 <script src="https://www.google.com/recaptcha/api.js?render={{ config['RECAPTCHA_SITE_KEY'] }}"></script>
 
 <style>
-    /* ... (all existing styles unchanged) ... */
-    .form-label-custom {
-        font-weight: 500;
-        color: #E2E8F0;
-        margin-bottom: 4px;
-        display: block;
-    }
+    /* existing styles ... */
+    .form-label-custom { font-weight: 500; color: #E2E8F0; margin-bottom: 4px; display: block; }
     .form-control-dark {
         background: rgba(25, 25, 50, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.15);
@@ -169,10 +157,7 @@
         color: #fff;
         outline: none;
     }
-    .form-control-dark::placeholder {
-        color: #94A3B8;
-        opacity: 0.8;
-    }
+    .form-control-dark::placeholder { color: #94A3B8; opacity: 0.8; }
     .form-select-dark {
         background: rgba(25, 25, 50, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.15);
@@ -196,60 +181,44 @@
         color: #fff;
         outline: none;
     }
-    .form-select-dark option {
-        background: #1a1a2e;
-        color: #F1F5F9;
-    }
-    .btn-outline-purple {
-        color: var(--primary-light);
-        border: 1px solid var(--primary);
-        background: transparent;
-        border-radius: 12px;
-        padding: 10px 14px;
-        font-size: 0.9rem;
-    }
-    .btn-outline-purple:hover {
-        background: var(--primary);
-        color: #fff;
-    }
-    .input-group .form-control-dark {
-        border-right: none;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-    }
-    .input-group .btn {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-    #submit-btn:disabled {
-        opacity: 0.5;
+    .form-select-dark option { background: #1a1a2e; color: #F1F5F9; }
+    .btn-outline-purple { color: var(--primary-light); border: 1px solid var(--primary); background: transparent; border-radius: 12px; padding: 10px 14px; font-size: 0.9rem; }
+    .btn-outline-purple:hover { background: var(--primary); color: #fff; }
+    .input-group .form-control-dark { border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    .input-group .btn { border-top-left-radius: 0; border-bottom-left-radius: 0; border: 1px solid rgba(255, 255, 255, 0.15); }
+    #submit-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+    .card-modern { background: rgba(10, 10, 25, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.05); }
+    #resend-otp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .form-check-dark .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
+    .form-check-dark .form-check-input { background-color: rgba(15, 15, 30, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); }
+
+    /* 🔧 Ensure verified email is readable */
+    .form-control-dark[readonly] {
+        background: rgba(15, 15, 30, 0.4);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #CBD5E1 !important;   /* lighter, clearly visible */
         cursor: not-allowed;
-        box-shadow: none;
-    }
-    .card-modern {
-        background: rgba(10, 10, 25, 0.7);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-    #resend-otp-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    /* Terms checkbox styling */
-    .form-check-dark .form-check-input:checked {
-        background-color: var(--primary);
-        border-color: var(--primary);
-    }
-    .form-check-dark .form-check-input {
-        background-color: rgba(15, 15, 30, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 </style>
 
 <script>
+// 1️⃣ Grab CSRF token and pre-verified flag from server
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-let emailVerified = false;
+let emailVerified = {{ 'true' if email_preverified else 'false' }};
+
+// DOM references
+const emailField = document.getElementById('email');
+const sendOtpBtn = document.getElementById('send-otp-btn');
+const otpSection = document.getElementById('otp-section');
+const otpInput = document.getElementById('otp-input');
+const verifyOtpBtn = document.getElementById('verify-otp-btn');
+const resendOtpBtn = document.getElementById('resend-otp-btn');
+const resendCountdown = document.getElementById('resend-countdown');
+const emailVerifiedDiv = document.getElementById('email-verified');
+const termsCheckbox = document.getElementById('terms-checkbox');
+const submitBtn = document.getElementById('submit-btn');
+const signupForm = document.getElementById('signup-form');
+const recaptchaTokenField = document.getElementById('recaptcha-token');
 
 // Resend OTP state
 let resendCount = 0;
@@ -257,32 +226,20 @@ const maxResends = 2;
 const cooldownSeconds = 78;
 let cooldownInterval = null;
 let cooldownRemaining = 0;
-const otpSection = document.getElementById('otp-section');
-const sendOtpBtn = document.getElementById('send-otp-btn');
-const resendOtpBtn = document.getElementById('resend-otp-btn');
-const resendCountdown = document.getElementById('resend-countdown');
-const otpInput = document.getElementById('otp-input');
-const verifyOtpBtn = document.getElementById('verify-otp-btn');
-const emailVerifiedDiv = document.getElementById('email-verified');
-const emailField = document.getElementById('email');
-const recaptchaTokenField = document.getElementById('recaptcha-token');
-const submitBtn = document.getElementById('submit-btn');
-const signupForm = document.getElementById('signup-form');
-const termsCheckbox = document.getElementById('terms-checkbox');  // NEW
 
-// reCAPTCHA helper – returns a token
+// reCAPTCHA helper
 async function getRecaptchaToken(action = 'signup') {
     try {
         const token = await grecaptcha.execute('{{ config['RECAPTCHA_SITE_KEY'] }}', { action: action });
         return token;
     } catch (error) {
         console.error('reCAPTCHA error:', error);
-        alert('reCAPTCHA verification failed. Please refresh the page and try again.');
+        alert('reCAPTCHA verification failed. Please refresh and try again.');
         return null;
     }
 }
 
-// Disable resend button and start countdown
+// Resend cooldown logic
 function disableResendWithCooldown() {
     resendOtpBtn.disabled = true;
     cooldownRemaining = cooldownSeconds;
@@ -308,13 +265,14 @@ function disableResendWithCooldown() {
     }, 1000);
 }
 
+// Check if signup form is ready to submit
 function checkSubmitReady() {
     const name = document.querySelector('input[name="name"]').value.trim();
     const email = emailField.value.trim();
     const password = document.querySelector('#password').value.trim();
     const confirm = document.querySelector('input[name="confirm_password"]').value.trim();
     const role = document.querySelector('#role').value;
-    const termsAccepted = termsCheckbox.checked;   // NEW
+    const termsAccepted = termsCheckbox.checked;
     if (name && email && password && confirm && role && emailVerified && termsAccepted) {
         submitBtn.disabled = false;
     } else {
@@ -322,7 +280,16 @@ function checkSubmitReady() {
     }
 }
 
-// Attach input listeners
+// Restore verified state on page load (if server says it's already verified)
+function applyVerifiedState() {
+    if (emailVerified) {
+        emailField.setAttribute('readonly', 'readonly');
+        emailField.classList.add('form-control-dark-verified');  // custom class for styling
+        emailVerifiedDiv.style.display = 'block';
+        sendOtpBtn.style.display = 'none';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const nameField = document.querySelector('input[name="name"]');
     const passwordField = document.getElementById('password');
@@ -332,14 +299,14 @@ document.addEventListener('DOMContentLoaded', function() {
     [nameField, emailField, passwordField, confirmField, roleField, termsCheckbox].forEach(field => {
         if (field) field.addEventListener('input', checkSubmitReady);
     });
-    // For checkbox, also listen to change event
     termsCheckbox.addEventListener('change', checkSubmitReady);
     roleField.addEventListener('change', checkSubmitReady);
+
+    applyVerifiedState();
 
     // Password strength meter (unchanged)
     const strengthBar = document.getElementById('password-strength-bar');
     const strengthText = document.getElementById('password-strength-text');
-
     function calculateStrength(password) {
         let score = 0;
         if (password.length >= 8) score++;
@@ -349,43 +316,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (/[^A-Za-z0-9]/.test(password)) score++;
         return score;
     }
-
     function updateStrengthIndicator(score) {
-        let percent = 0;
-        let color = '';
-        let text = '';
-        if (score <= 2) {
-            percent = (score / 5) * 100;
-            color = '#EF4444';
-            text = 'Weak – try adding more character types';
-        } else if (score <= 4) {
-            percent = (score / 5) * 100;
-            color = '#F59E0B';
-            text = 'Medium – almost there';
-        } else {
-            percent = 100;
-            color = '#10B981';
-            text = 'Strong – great password!';
-        }
+        let percent = 0, color = '', text = '';
+        if (score <= 2) { percent = (score / 5) * 100; color = '#EF4444'; text = 'Weak – try adding more character types'; }
+        else if (score <= 4) { percent = (score / 5) * 100; color = '#F59E0B'; text = 'Medium – almost there'; }
+        else { percent = 100; color = '#10B981'; text = 'Strong – great password!'; }
         strengthBar.style.width = percent + '%';
         strengthBar.style.backgroundColor = color;
         strengthText.textContent = text;
         strengthText.style.color = color;
     }
-
     passwordField.addEventListener('input', function() {
         const pwd = passwordField.value;
         const score = calculateStrength(pwd);
         updateStrengthIndicator(score);
     });
 
-    // ============ OTP SEND ============
+    // ===== OTP SEND =====
     sendOtpBtn.addEventListener('click', async function() {
         const email = emailField.value.trim();
-        if (!email) {
-            alert('Please enter an email address.');
-            return;
-        }
+        if (!email) { alert('Please enter an email address.'); return; }
 
         const token = await getRecaptchaToken('send_otp');
         if (!token) return;
@@ -396,11 +346,8 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const res = await fetch('/send_otp', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ email: email, 'g-recaptcha-response': token })
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({ email, 'g-recaptcha-response': token })
             });
             const data = await res.json();
             if (data.success) {
@@ -410,6 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 resendCount = 0;
                 disableResendWithCooldown();
             } else {
+                // Show specific error (e.g., already registered)
                 alert('Failed to send OTP: ' + data.message);
             }
         } catch (err) {
@@ -420,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ============ RESEND OTP ============
+    // ===== RESEND OTP =====
     resendOtpBtn.addEventListener('click', async function() {
         if (resendOtpBtn.disabled || resendCount >= maxResends) return;
         const email = emailField.value.trim();
@@ -435,11 +383,8 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const res = await fetch('/send_otp', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ email: email, 'g-recaptcha-response': token })
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({ email, 'g-recaptcha-response': token })
             });
             const data = await res.json();
             if (data.success) {
@@ -461,30 +406,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ============ VERIFY OTP ============
+    // ===== VERIFY OTP =====
     verifyOtpBtn.addEventListener('click', async function() {
         const otp = otpInput.value.trim();
-        if (!otp) {
-            alert('Please enter the OTP.');
-            return;
-        }
+        if (!otp) { alert('Please enter the OTP.'); return; }
         verifyOtpBtn.disabled = true;
         verifyOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         try {
             const res = await fetch('/verify_otp', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ email: emailField.value.trim(), otp: otp })
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({ email: emailField.value.trim(), otp })
             });
             const data = await res.json();
             if (data.success) {
                 emailVerified = true;
                 emailField.setAttribute('readonly', 'readonly');
-                emailField.classList.add('text-muted');
+                emailField.classList.add('form-control-dark-verified');
                 otpSection.style.display = 'none';
                 emailVerifiedDiv.style.display = 'block';
                 checkSubmitReady();
@@ -499,18 +438,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ============ FORM SUBMISSION (via button click) ============
+    // ===== FORM SUBMISSION =====
     submitBtn.addEventListener('click', async function() {
         if (submitBtn.disabled) return;
-
-        if (!emailVerified) {
-            alert('Please verify your email first.');
-            return;
-        }
-        if (!termsCheckbox.checked) {
-            alert('You must agree to the Terms and Conditions.');
-            return;
-        }
+        if (!emailVerified) { alert('Please verify your email first.'); return; }
+        if (!termsCheckbox.checked) { alert('You must agree to the Terms and Conditions.'); return; }
 
         const token = await getRecaptchaToken('signup');
         if (!token) return;
@@ -519,7 +451,6 @@ document.addEventListener('DOMContentLoaded', function() {
         signupForm.submit();
     });
 
-    // Initial check
     checkSubmitReady();
 });
 </script>

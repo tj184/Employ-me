@@ -84,24 +84,34 @@ def signup():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = SignupForm()
+
+    email_preverified = False
+
+    # ---- GET request: pre‑fill email if already verified ----
+    if request.method == 'GET' and session.get('email_verified'):
+        form.email.data = session.get('email_verified')
+        email_preverified = True
+
     if form.validate_on_submit():
         # ---- reCAPTCHA verification ----
         token = request.form.get('g-recaptcha-response')
         if not token:
             flash('reCAPTCHA token missing. Please refresh and try again.', 'danger')
-            return render_template('signup.html', form=form)
+            return render_template('signup.html', form=form,
+                                   email_preverified=(session.get('email_verified') == form.email.data))
         valid, error = verify_recaptcha(token)
         if not valid:
             flash(error, 'danger')
-            return render_template('signup.html', form=form)
+            return render_template('signup.html', form=form,
+                                   email_preverified=(session.get('email_verified') == form.email.data))
 
-        # ---- existing email verification check ----
+        # ---- email verification check ----
         if session.get('email_verified') != form.email.data:
             flash('Please verify your email before signing up.', 'danger')
-            return render_template('signup.html', form=form)
+            return render_template('signup.html', form=form,
+                                   email_preverified=(session.get('email_verified') == form.email.data))
 
-        # ... (rest of signup logic unchanged)
-
+        # ---- signup logic (unchanged) ----
         hashed_pw = generate_password_hash(form.password.data)
         user = User(
             email=form.email.data,
@@ -119,8 +129,14 @@ def signup():
             return redirect(url_for('jobseeker_dashboard'))
         else:
             return redirect(url_for('employer_profile'))
-    return render_template('signup.html', form=form)
 
+    # ---- POST with validation errors or GET without verified email ----
+    if request.method == 'POST':
+        # If the submitted email matches the verified one, keep the verified state
+        if session.get('email_verified') == request.form.get('email'):
+            email_preverified = True
+
+    return render_template('signup.html', form=form, email_preverified=email_preverified)
 @app.route('/logout')
 @login_required
 def logout():
@@ -458,7 +474,7 @@ def send_otp_email(to_email, otp):
 def send_otp():
     data = request.get_json()
     email = data.get('email')
-    token = data.get('g-recaptcha-response')   # <-- new
+    token = data.get('g-recaptcha-response')
 
     if not email:
         return jsonify({'success': False, 'message': 'Email required'}), 400
@@ -469,6 +485,11 @@ def send_otp():
     valid, error = verify_recaptcha(token)
     if not valid:
         return jsonify({'success': False, 'message': error}), 400
+
+    # 🔒 Check if email already registered
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'success': False, 'message': 'This email is already registered.'}), 400
 
     # OTP logic (unchanged)
     otp = str(random.randint(100000, 999999))
