@@ -3,59 +3,92 @@
 {% block content %}
 <div class="row justify-content-center mt-4">
     <div class="col-md-8">
+
+        <!-- ===== SINGLE CARD: Contact Info + Message Form ===== -->
         <div class="card-modern p-4">
-            <div class="text-center mb-3">
-                <i class="fas fa-envelope fa-2x" style="color: var(--primary-light); opacity: 0.7;"></i>
+
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <i class="fas fa-envelope fa-2x mb-2" style="color: var(--primary-light); opacity: 0.7;"></i>
+                <h2 style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+                    Contact <span class="gradient-text">Us</span>
+                </h2>
+                <p class="text-secondary mb-0">We'd love to hear from you</p>
             </div>
-            <h2 class="text-center mb-4" style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
-                Contact <span class="gradient-text">Us</span>
-            </h2>
-            <p class="text-center text-secondary mb-4">We’d love to hear from you. Fill out the form below or reach us directly.</p>
 
-            <form>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label-custom">Your Name</label>
-                        <input type="text" class="form-control-dark" placeholder="John Doe">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label-custom">Your Email</label>
-                        <input type="email" class="form-control-dark" placeholder="you@example.com">
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label-custom">Subject</label>
-                    <input type="text" class="form-control-dark" placeholder="How can we help?">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label-custom">Message</label>
-                    <textarea class="form-control-dark" rows="5" placeholder="Write your message..."></textarea>
-                </div>
-                <button type="button" class="btn btn-primary-gradient w-100 py-2">
-                    <i class="fas fa-paper-plane me-2"></i> Send Message
-                </button>
-            </form>
-
-            <hr style="border-color: rgba(255,255,255,0.05);" class="my-4">
-
-            <div class="row text-center">
-                <div class="col-md-4 mb-3">
+            <!-- Contact Details Row -->
+            <div class="row text-center mb-4">
+                <div class="col-md-4 mb-3 mb-md-0">
                     <i class="fas fa-map-marker-alt fa-2x mb-2" style="color: var(--employer-light);"></i>
                     <h6 style="color: #F8FAFC;">Address</h6>
                     <p class="text-secondary small">123 Business Street, New Delhi, India</p>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-4 mb-3 mb-md-0">
                     <i class="fas fa-phone fa-2x mb-2" style="color: var(--primary-light);"></i>
                     <h6 style="color: #F8FAFC;">Phone</h6>
                     <p class="text-secondary small">+91 98765 43210</p>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-4">
                     <i class="fas fa-envelope fa-2x mb-2" style="color: var(--accent-gold);"></i>
                     <h6 style="color: #F8FAFC;">Email</h6>
                     <p class="text-secondary small">support@employ-me.com</p>
                 </div>
             </div>
-        </div>
+
+            <!-- Social Links -->
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="https://instagram.com" target="_blank" class="social-link"><i class="fab fa-instagram fa-lg"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-link"><i class="fab fa-twitter fa-lg"></i></a>
+                <a href="https://linkedin.com" target="_blank" class="social-link"><i class="fab fa-linkedin fa-lg"></i></a>
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.05);">
+
+            <!-- Message Form Heading -->
+            <h2 class="text-center mb-3 mt-4" style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+                Send Us a <span class="gradient-text">Message</span>
+            </h2>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-modern alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- The Form -->
+            <form method="POST" id="contact-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">Your Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control-dark" placeholder="John Doe" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">Your Email <span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control-dark" placeholder="you@example.com" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-custom">Subject <span class="text-danger">*</span></label>
+                    <input type="text" name="subject" class="form-control-dark" placeholder="How can we help?" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label-custom">Message <span class="text-danger">*</span></label>
+                    <textarea name="message" class="form-control-dark" rows="5" placeholder="Write your message..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary-gradient w-100 py-2" id="submit-btn">
+                    <i class="fas fa-paper-plane me-2"></i> Send Message
+                </button>
+            </form>
+
+        </div><!-- /single card -->
+
     </div>
 </div>
 {% endblock %}
@@ -88,5 +121,36 @@
         outline: none;
     }
     .form-control-dark::placeholder { color: #94A3B8; opacity: 0.8; }
+
+    /* Social Links */
+    .social-link {
+        color: #94A3B8;
+        transition: color 0.3s, transform 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+    }
+    .social-link:hover {
+        color: var(--primary-light);
+        transform: translateY(-2px);
+        border-color: var(--primary);
+    }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', function(e) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    });
+});
+</script>
 {% endblock %}

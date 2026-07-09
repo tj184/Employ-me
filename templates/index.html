@@ -200,6 +200,28 @@
         </div>
     </section>
 
+    <!-- ===== STATISTICS COUNTER SECTION (static values 2000 & 850) ===== -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="stats-card p-4 p-md-5">
+                        <div class="row text-center">
+                            <div class="col-6 border-end border-secondary border-opacity-25">
+                                <div class="stats-number" id="user-count" data-target="2000">2000+</div>
+                                <div class="stats-label">Registered Users</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stats-number" id="business-count" data-target="850">850+</div>
+                                <div class="stats-label">Businesses</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== SWITCH ACCOUNT TYPE CARD (after How It Works, only if logged in) ===== -->
     {% if current_user.is_authenticated %}
     <div class="row justify-content-center mt-2 mb-5">
@@ -420,6 +442,52 @@
     }
 
     /* ============================================================
+       STATISTICS COUNTER
+       ============================================================ */
+    .stats-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 28px;
+        box-shadow: 0 20px 60px -16px rgba(0,0,0,0.4);
+        transition: all 0.35s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 70px -10px rgba(168, 85, 247, 0.15);
+        border-color: rgba(168, 85, 247, 0.2);
+    }
+    .stats-number {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: 3.5rem;
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--employer-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        transition: all 0.3s ease;
+    }
+    .stats-label {
+        font-family: var(--font-sans);
+        font-weight: 600;
+        color: #94A3B8;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 8px;
+    }
+    @media (max-width: 576px) {
+        .stats-number {
+            font-size: 2.5rem;
+        }
+        .stats-label {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* ============================================================
        TESTIMONIAL MARQUEE STYLES
        ============================================================ */
     .testimonial-slider {
@@ -443,7 +511,8 @@
         border-radius: 24px;
         box-shadow: 0 20px 60px -16px rgba(0,0,0,0.4);
         transition: all 0.35s ease;
-        min-width: 350px;          /* fixed width for consistent scrolling */
+        min-width: 300px;          /* slightly narrower for better proportion */
+        max-width: 320px;          /* prevents cards from becoming too long */
         flex-shrink: 0;
     }
     .testimonial-card:hover {
@@ -498,12 +567,13 @@
         }
         .testimonial-card {
             min-width: 280px;
+            max-width: 300px;
         }
     }
 </style>
 
 <script>
-    // Pause on hover (CSS already handles the pause, but we can add JS to ensure compatibility)
+    // Pause on hover for testimonials
     document.addEventListener('DOMContentLoaded', function() {
         const track = document.getElementById('testimonialTrack');
         if (track) {
@@ -513,6 +583,42 @@
             track.addEventListener('mouseleave', () => {
                 track.style.animationPlayState = 'running';
             });
+        }
+
+        // Animated counter for statistics
+        const counters = document.querySelectorAll('.stats-number');
+        const speed = 200; // lower = faster animation
+
+        function animateCounter(counter) {
+            const target = +counter.getAttribute('data-target');
+            let count = 0;
+            const increment = target / speed;
+
+            const updateCounter = () => {
+                count += increment;
+                if (count < target) {
+                    counter.textContent = Math.ceil(count) + '+';
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent = target + '+';
+                }
+            };
+            updateCounter();
+        }
+
+        // Only animate when section is visible (Intersection Observer)
+        const statsSection = document.querySelector('.stats-card');
+        if (statsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        counters.forEach(counter => animateCounter(counter));
+                        observer.unobserve(statsSection);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            observer.observe(statsSection);
         }
     });
 </script>

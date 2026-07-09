@@ -19,6 +19,8 @@ from flask import jsonify, session
 import requests
 import time
 
+
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -622,8 +624,78 @@ def verify_recaptcha(token):
 def help():
     return render_template('help.html')
 
-@app.route('/contact')
+
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
+    if request.method == 'POST':
+        # ---- Collect form data ----
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message = request.form.get('message', '').strip()
+
+        # ---- Validation ----
+        if not all([name, email, subject, message]):
+            flash('All fields are required.', 'danger')
+            return render_template('contact.html')
+
+        # ---- Rate limit: max 2 messages per 24 hours ----
+        now = time.time()
+        window = 24 * 60 * 60  # 24 hours in seconds
+        # Use session key to track count and first request time
+        if 'contact_count' not in session or 'contact_first_time' not in session:
+            session['contact_count'] = 0
+            session['contact_first_time'] = now
+
+        # Reset the window if 24 hours have passed
+        if now - session['contact_first_time'] > window:
+            session['contact_count'] = 0
+            session['contact_first_time'] = now
+
+        if session['contact_count'] >= 2:
+            flash('You have reached the maximum of 2 messages per 24 hours. Please try again later.', 'danger')
+            return render_template('contact.html')
+
+        # ---- Send email via Resend ----
+        try:
+            api_key = os.environ.get('RESEND_API_KEY')
+            from_email = os.environ.get('EMAIL_USER')
+            if not api_key or not from_email:
+                flash('Email service not configured. Please try again later.', 'danger')
+                return render_template('contact.html')
+
+            email_body = f"""
+            New message from {name} ({email})
+
+            Subject: {subject}
+
+            Message:
+            {message}
+            """
+            response = requests.post(
+                "https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json={
+                    "from": f"Employ-me Contact <{from_email}>",
+                    "to": ["tanishjain184@gmail.com"],
+                    "reply_to": email,
+                    "subject": f"Contact: {subject}",
+                    "text": email_body
+                }
+            )
+            if response.status_code != 200:
+                raise Exception(f"Resend error: {response.text}")
+
+            # Increment count only after successful send
+            session['contact_count'] += 1
+            flash('Your message has been sent successfully! We will get back to you soon.', 'success')
+        except Exception as e:
+            flash('Failed to send message. Please try again later.', 'danger')
+            print(f"Contact email error: {e}")  # optional logging
+
+        return render_template('contact.html')
+
+    # GET request
     return render_template('contact.html')
 
 # Mount the admin app under /admin
