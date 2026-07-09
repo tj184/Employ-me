@@ -16,7 +16,7 @@
 
     <style>
         /* ============================================================
-           ROOT VARIABLES – Refined Neon / Cyber Palette
+           ROOT VARIABLES – Dark Theme (default)
            ============================================================ */
         :root {
             --primary: #A855F7;
@@ -46,6 +46,34 @@
             --font-display: 'Outfit', sans-serif;
         }
 
+        /* ============================================================
+           LIGHT THEME OVERRIDES (soft & complementary)
+           ============================================================ */
+        body.light-theme {
+            --primary: #7C3AED;
+            --primary-dark: #5B21B6;
+            --primary-light: #A855F7;
+            --primary-glow: 0 0 20px rgba(124, 58, 237, 0.3);
+            --primary-gradient: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+
+            --employer: #0891B2;
+            --employer-dark: #065F8A;
+            --employer-light: #22D3EE;
+            --employer-glow: 0 0 20px rgba(8, 145, 178, 0.3);
+            --employer-gradient: linear-gradient(135deg, #0891B2 0%, #065F8A 100%);
+
+            --accent-gold: #D97706;
+            --accent-gold-dark: #B45309;
+
+            --bg-dark: #F0F4F8;                    /* soft grayish‑blue */
+            --bg-card: rgba(255, 255, 255, 0.85);  /* frosted white */
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --text-primary: #1E293B;               /* dark slate */
+            --text-secondary: #475569;              /* medium slate */
+            --border-glass: rgba(0, 0, 0, 0.08);
+            --border-highlight: rgba(124, 58, 237, 0.3);
+        }
+
         * { margin:0; padding:0; box-sizing:border-box; }
 
         body {
@@ -63,6 +91,12 @@
             z-index: 0;
         }
 
+        body.light-theme {
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(8, 145, 178, 0.04) 0%, transparent 50%);
+        }
+
         /* subtle animated grid overlay */
         body::before {
             content: '';
@@ -76,6 +110,11 @@
             z-index: -1;
             animation: gridMove 30s linear infinite;
         }
+        body.light-theme::before {
+            background-image:
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+        }
         @keyframes gridMove {
             0% { transform: translate(0, 0); }
             100% { transform: translate(60px, 60px); }
@@ -86,6 +125,8 @@
         ::-webkit-scrollbar-track { background: #1A1A2E; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--primary), var(--employer)); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--primary-light), var(--employer-light)); }
+        body.light-theme ::-webkit-scrollbar-track { background: #e9ecef; }
+        body.light-theme ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--primary), var(--employer)); }
 
         /* ============================================================
            NAVBAR – Glass morphic, elegant glow
@@ -101,6 +142,13 @@
             top: 0;
             z-index: 1000;
             transition: all 0.3s ease;
+        }
+        body.light-theme .navbar-custom {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
         .navbar-custom::after {
             content: '';
@@ -122,6 +170,9 @@
             align-items: center;
             gap: 10px;
         }
+        body.light-theme .navbar-custom .navbar-brand {
+            color: #212529;
+        }
         .navbar-custom .navbar-brand img {
             height: 36px;
             width: auto;
@@ -142,10 +193,18 @@
             transition: all 0.25s ease;
             position: relative;
         }
+        body.light-theme .navbar-custom .nav-link {
+            color: #495057;
+        }
         .navbar-custom .nav-link:hover {
             color: #fff;
             background: rgba(168, 85, 247, 0.1);
             text-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+        }
+        body.light-theme .navbar-custom .nav-link:hover {
+            color: #212529;
+            background: rgba(124, 58, 237, 0.08);
+            text-shadow: none;
         }
         /* Underline glow on hover */
         .navbar-custom .nav-link::after {
@@ -193,6 +252,9 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+        body.light-theme .navbar-custom .navbar-text {
+            color: #212529;
         }
         .navbar-custom .navbar-text i {
             color: var(--primary);
@@ -276,6 +338,10 @@
             border-radius: 0 0 40px 40px;
             margin-bottom: 20px;
         }
+        body.light-theme .hero-index {
+            background: radial-gradient(ellipse at 30% 20%, rgba(124, 58, 237, 0.06) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 80%, rgba(8, 145, 178, 0.05) 0%, transparent 60%);
+        }
         .hero-index .display-3 {
             font-family: var(--font-display);
             font-weight: 900;
@@ -283,6 +349,9 @@
             line-height: 1.1;
             font-size: 4rem;
             color: #F8FAFC;
+        }
+        body.light-theme .hero-index .display-3 {
+            color: #212529;
         }
         .hero-index .display-3 .gradient-text {
             background: linear-gradient(135deg, var(--primary-light) 0%, var(--employer-light) 100%);
@@ -297,6 +366,9 @@
             max-width: 560px;
             margin-left: auto;
             margin-right: auto;
+        }
+        body.light-theme .hero-index .lead {
+            color: #6c757d;
         }
 
         /* Floating orbs (no JS) */
@@ -358,10 +430,17 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.03);
         }
+        body.light-theme .dashboard-hero {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
         .dashboard-hero.jobseeker {
             background: radial-gradient(ellipse at 70% 30%, #7C3AED 0%, #2D1B4E 70%, #0B0B14 100%);
             background-size: 200% 200%;
             animation: bgPulse 8s ease-in-out infinite alternate;
+        }
+        body.light-theme .dashboard-hero.jobseeker {
+            background: radial-gradient(ellipse at 70% 30%, #A855F7 0%, #EDE9FE 70%, #F8F9FA 100%);
         }
         .dashboard-hero.jobseeker::after {
             content: '';
@@ -375,6 +454,9 @@
             background: radial-gradient(ellipse at 30% 70%, #0891B2 0%, #0A2A3A 70%, #0B0B14 100%);
             background-size: 200% 200%;
             animation: bgPulse 8s ease-in-out infinite alternate-reverse;
+        }
+        body.light-theme .dashboard-hero.employer {
+            background: radial-gradient(ellipse at 30% 70%, #22D3EE 0%, #E0F2FE 70%, #F8F9FA 100%);
         }
         .dashboard-hero.employer::after {
             content: '';
@@ -400,7 +482,12 @@
             color: #F8FAFC;
             text-shadow: 0 0 30px rgba(0,0,0,0.4);
         }
+        body.light-theme .dashboard-hero .display-4 {
+            color: #212529;
+            text-shadow: none;
+        }
         .dashboard-hero .lead { opacity: 0.9; font-weight: 400; color: #E2E8F0; }
+        body.light-theme .dashboard-hero .lead { color: #495057; }
         .dashboard-hero .btn-white {
             background: rgba(255, 255, 255, 0.9);
             color: #0B0B14;
@@ -411,10 +498,21 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
         }
+        body.light-theme .dashboard-hero .btn-white {
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
         .dashboard-hero .btn-white:hover {
             transform: translateY(-4px);
             box-shadow: 0 16px 48px rgba(0,0,0,0.5);
             background: #fff;
+            color: #0B0B14;
+        }
+        body.light-theme .dashboard-hero .btn-white:hover {
+            background: #212529;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
         /* ============================================================
@@ -432,6 +530,10 @@
             height: 100%;
             position: relative;
             overflow: hidden;
+        }
+        body.light-theme .card-modern {
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
         .card-modern::before {
             content: '';
@@ -481,10 +583,16 @@
             color: #F8FAFC;
             margin-bottom: 12px;
         }
+        body.light-theme .card-modern .card-title {
+            color: #212529;
+        }
         .card-modern .card-text {
             color: #94A3B8;
             font-size: 0.95rem;
             line-height: 1.7;
+        }
+        body.light-theme .card-modern .card-text {
+            color: #495057;
         }
 
         /* ============================================================
@@ -501,11 +609,17 @@
             color: #E2E8F0;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
+        body.light-theme .alert-modern {
+            background: rgba(255,255,255,0.8);
+            color: #212529;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
         .alert-success { border-left-color: #10B981; }
         .alert-danger { border-left-color: #EF4444; }
         .alert-warning { border-left-color: #F59E0B; }
         .alert-info { border-left-color: var(--employer); }
         .alert-modern .btn-close { filter: invert(1) brightness(0.8); }
+        body.light-theme .alert-modern .btn-close { filter: none; }
 
         /* ============================================================
            FOOTER
@@ -516,6 +630,11 @@
             padding: 36px 0;
             margin-top: 60px;
             border-top: 1px solid rgba(168, 85, 247, 0.05);
+        }
+        body.light-theme .footer-custom {
+            background: #212529;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         .footer-custom a {
             color: rgba(255, 255, 255, 0.35);
@@ -550,6 +669,96 @@
         .navbar-custom .navbar-toggler-icon {
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
+        body.light-theme .navbar-custom .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0,0,0,0.6)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Theme toggle button */
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #CBD5E1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        body.light-theme .theme-toggle-btn {
+            border-color: rgba(0,0,0,0.15);
+            color: #495057;
+        }
+        .theme-toggle-btn:hover {
+            background: rgba(168,85,247,0.1);
+            border-color: var(--primary);
+        }
+
+        /* ============================================================
+           LIGHT THEME – FORM, INPUT & SELECT OVERRIDES
+           (cyan‑blueish glass design)
+           ============================================================ */
+        body.light-theme .form-control-dark {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            color: #1E293B;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        body.light-theme .form-control-dark:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.2), inset 0 2px 4px rgba(0,0,0,0.05);
+            color: #0F172A;
+        }
+        body.light-theme .form-control-dark::placeholder {
+            color: #64748B;
+            opacity: 0.9;
+        }
+        body.light-theme .form-select-dark {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            color: #1E293B;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        body.light-theme .form-select-dark:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.2);
+            color: #0F172A;
+        }
+        body.light-theme .form-select-dark option {
+            background: #ffffff;
+            color: #1E293B;
+        }
+        body.light-theme .form-check-dark .form-check-input {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0,0,0,0.2);
+        }
+        body.light-theme .form-check-dark .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        body.light-theme .form-check-dark .form-check-label {
+            color: #334155;
+        }
+        body.light-theme .form-control-dark[readonly] {
+            background: rgba(240, 244, 248, 0.7);
+            border-color: rgba(0,0,0,0.05);
+            color: #475569;
+        }
+
+        /* make login/signup cards slightly more translucent with a cyan tint */
+        body.light-theme .card-modern {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 150, 199, 0.1);
+        }
+        body.light-theme .card-modern::before {
+            background: linear-gradient(145deg, rgba(8, 145, 178, 0.2), rgba(124, 58, 237, 0.1), transparent 80%);
+        }
     </style>
 </head>
 <body>
@@ -559,10 +768,16 @@
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Employ-me logo" />
                 <span>Employ‑me</span>
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fas fa-bars" style="color: var(--primary-light); font-size: 1.5rem;"></i>
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <!-- Theme Toggle Button (visible on all screens) -->
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle light/dark theme">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2">
                     <!-- Home button (always visible) -->
@@ -648,7 +863,6 @@
                 <div class="col-md-6 text-center text-md-end small">
                     &copy; 2026 Employ‑me – All rights reserved.
                     <span class="mx-2">·</span>
-                    <!-- Privacy link now triggers a modal -->
                     <a href="#" class="text-white-50" data-bs-toggle="modal" data-bs-target="#footerPrivacyModal">Privacy</a>
                     <span class="mx-1">·</span>
                     <a href="#" class="text-white-50" data-bs-toggle="modal" data-bs-target="#footerTermsModal">Terms</a>
@@ -718,6 +932,37 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ========== THEME TOGGLE ==========
+        const body = document.body;
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function setTheme(isLight) {
+            if (isLight) {
+                body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            setTheme(true);
+        } else {
+            setTheme(false);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            setTheme(!body.classList.contains('light-theme'));
+        });
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
