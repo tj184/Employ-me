@@ -89,6 +89,15 @@
                     </label>
                 </div>
 
+                <!-- Privacy Policy Checkbox -->
+                <div class="mb-3 form-check-dark d-flex align-items-center">
+                    <input class="form-check-input me-2" type="checkbox" id="privacy-checkbox" style="width: 18px; height: 18px;">
+                    <label class="form-check-label" for="privacy-checkbox" style="color: #CBD5E1; font-size: 0.9rem;">
+                        I have read and accept the
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" style="color: var(--primary-light); text-decoration: underline;">Privacy Policy</a>
+                    </label>
+                </div>
+
                 <!-- Sign‑up button (type="button") -->
                 <button type="button" class="btn btn-primary-gradient w-100 py-2" id="submit-btn" disabled>
                     <i class="fas fa-user-plus"></i> Sign Up
@@ -124,6 +133,36 @@
                 <p>Your personal data is handled in accordance with our Privacy Policy. We do not share your information without your consent except as required by law.</p>
                 <h6>6. Termination</h6>
                 <p>We reserve the right to suspend or terminate accounts that violate these terms without prior notice.</p>
+                <p class="mt-3 text-secondary">Last updated: July 2026</p>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Policy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content" style="background: rgba(20, 20, 45, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #E2E8F0;">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="privacyModalLabel" style="font-family: var(--font-display); font-weight: 700;">Privacy Policy</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Information We Collect</h6>
+                <p>We collect information you provide directly, such as your name, email address, and profile details. We also automatically collect certain technical information when you use our service.</p>
+                <h6>2. How We Use Information</h6>
+                <p>We use the information to provide, maintain, and improve our services, to communicate with you, and to ensure the security of our platform.</p>
+                <h6>3. Sharing of Information</h6>
+                <p>We do not share your personal information with third parties except as necessary to provide the service, comply with the law, or protect our rights.</p>
+                <h6>4. Data Security</h6>
+                <p>We implement reasonable security measures to protect your data. However, no method of transmission over the Internet is 100% secure.</p>
+                <h6>5. Your Choices</h6>
+                <p>You can update or delete your account at any time. You may also contact us to request access to your personal data.</p>
+                <h6>6. Changes to This Policy</h6>
+                <p>We may update this policy from time to time. Continued use of the service after changes constitutes acceptance.</p>
                 <p class="mt-3 text-secondary">Last updated: July 2026</p>
             </div>
             <div class="modal-footer border-top-0">
@@ -230,6 +269,7 @@ const resendCountdown = document.getElementById('resend-countdown');
 const emailVerifiedDiv = document.getElementById('email-verified');
 const changeEmailBtn = document.getElementById('change-email-btn');
 const termsCheckbox = document.getElementById('terms-checkbox');
+const privacyCheckbox = document.getElementById('privacy-checkbox');  // NEW
 const submitBtn = document.getElementById('submit-btn');
 const signupForm = document.getElementById('signup-form');
 const recaptchaTokenField = document.getElementById('recaptcha-token');
@@ -282,7 +322,7 @@ function disableResendWithCooldown() {
     }, 1000);
 }
 
-// Check if signup form is ready to submit (now includes password strength)
+// Check if signup form is ready to submit (now includes password strength AND privacy checkbox)
 function checkSubmitReady() {
     const name = document.querySelector('input[name="name"]').value.trim();
     const email = emailField.value.trim();
@@ -290,8 +330,9 @@ function checkSubmitReady() {
     const confirm = document.querySelector('input[name="confirm_password"]').value.trim();
     const role = document.querySelector('#role').value;
     const termsAccepted = termsCheckbox.checked;
-    // 🔥 Only allow medium/strong passwords (score >= 3)
-    if (name && email && password && confirm && role && emailVerified && termsAccepted && passwordStrengthScore >= 3) {
+    const privacyAccepted = privacyCheckbox.checked;   // NEW
+    // 🔥 Only allow medium/strong passwords (score >= 3) AND both checkboxes ticked
+    if (name && email && password && confirm && role && emailVerified && termsAccepted && privacyAccepted && passwordStrengthScore >= 3) {
         submitBtn.disabled = false;
     } else {
         submitBtn.disabled = true;
@@ -327,10 +368,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmField = document.querySelector('input[name="confirm_password"]');
     const roleField = document.getElementById('role');
 
-    [nameField, emailField, passwordField, confirmField, roleField, termsCheckbox].forEach(field => {
+    [nameField, emailField, passwordField, confirmField, roleField, termsCheckbox, privacyCheckbox].forEach(field => {
         if (field) field.addEventListener('input', checkSubmitReady);
     });
     termsCheckbox.addEventListener('change', checkSubmitReady);
+    privacyCheckbox.addEventListener('change', checkSubmitReady);   // NEW
     roleField.addEventListener('change', checkSubmitReady);
 
     applyVerifiedState();
@@ -480,6 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (submitBtn.disabled) return;
         if (!emailVerified) { alert('Please verify your email first.'); return; }
         if (!termsCheckbox.checked) { alert('You must agree to the Terms and Conditions.'); return; }
+        if (!privacyCheckbox.checked) { alert('You must accept the Privacy Policy.'); return; }   // NEW
         // 🔥 Final safety check – password must be at least medium strength
         if (passwordStrengthScore < 3) {
             alert('Please choose a stronger password (at least Medium strength).');
