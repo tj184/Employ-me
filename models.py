@@ -84,3 +84,33 @@ class EmployerProfile(db.Model):
     profile_pic = db.Column(db.String(200))   # business profile picture
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Job(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Link to the employer who created this job
+    employer_id = db.Column(db.Integer, db.ForeignKey('employer_profile.id'), nullable=False)
+
+    # Employer details (pre‑filled from EmployerProfile so they remain readable even if profile changes later)
+    employer_name = db.Column(db.String(100), nullable=False)          # business_name
+    employer_address = db.Column(db.String(300), nullable=False)       # business_address
+    employer_mobile = db.Column(db.String(15), nullable=False)         # contact_person_phone
+    employer_city = db.Column(db.String(100), nullable=False)
+    employer_state = db.Column(db.String(100), nullable=False)
+    employer_pincode = db.Column(db.String(10), nullable=False)
+
+    # Job details
+    job_name = db.Column(db.String(200), nullable=False)
+    job_description = db.Column(db.Text, nullable=False)
+    job_type = db.Column(db.String(50), nullable=False)   # e.g., Full-time, Part-time, Contract, etc.
+    committed_salary = db.Column(db.String(100))          # e.g., "₹15,000 – ₹25,000 per month"
+    location = db.Column(db.String(200))                  # job location (city/area)
+    vacancies = db.Column(db.Integer, default=1)
+    status = db.Column(db.String(20), default='Open')     # Open / Closed
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship back to EmployerProfile (optional but convenient)
+    employer = db.relationship('EmployerProfile', backref='jobs')

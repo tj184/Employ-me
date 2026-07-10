@@ -229,3 +229,18 @@ class EmployerForm(FlaskForm):
     profile_pic = FileField('Business Profile Picture (optional)', validators=[FileAllowed(['jpg','png','jpeg'], 'Images only!')])
 
     submit = SubmitField('Save Business Profile')
+
+class JobForm(FlaskForm):
+    job_name = StringField('Job Title', validators=[DataRequired(), Length(max=200)])
+    job_description = TextAreaField('Job Description', validators=[DataRequired()])
+    job_type = SelectField('Job Type', choices=[
+        ('Full-time', 'Full-time'),
+        ('Part-time', 'Part-time'),
+        ('Contract', 'Contract'),
+        ('Freelance', 'Freelance'),
+        ('Internship', 'Internship')
+    ], validators=[DataRequired()])
+    committed_salary = StringField('Salary (e.g., ₹15,000 – ₹25,000/month)', validators=[DataRequired(), Length(max=100)])
+    location = StringField('Job Location', validators=[DataRequired(), Length(max=200)])
+    vacancies = StringField('Number of Vacancies', validators=[DataRequired()])
+    submit = SubmitField('Save Job')

@@ -6,8 +6,8 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired
 from config import Config
-from models import db, User, JobSeekerProfile, EmployerProfile
-from forms import LoginForm, SignupForm, ProfileForm, EmployerForm, INDIAN_CITIES, SKILLS_CHOICES
+from models import db, User, JobSeekerProfile, EmployerProfile, Job
+from forms import LoginForm, SignupForm, ProfileForm, EmployerForm, INDIAN_CITIES, SKILLS_CHOICES,JobForm
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from admin import admin_app 
 import csv
@@ -697,6 +697,99 @@ def contact():
 
     # GET request
     return render_template('contact.html')
+
+@app.route('/job/create', methods=['GET', 'POST'])
+@login_required
+@role_required('employer')
+def create_job():
+    employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+    if not employer:
+        flash('Please complete your business profile first.', 'warning')
+        return redirect(url_for('employer_profile'))
+
+    form = JobForm()
+    if form.validate_on_submit():
+        job = Job(
+            employer_id=employer.id,
+            employer_name=employer.business_name,
+            employer_address=employer.business_address,
+            employer_mobile=employer.contact_person_phone,
+            employer_city=employer.city,
+            employer_state=employer.state,
+            employer_pincode=employer.pincode,
+            job_name=form.job_name.data,
+            job_description=form.job_description.data,
+            job_type=form.job_type.data,
+            committed_salary=form.committed_salary.data,
+            location=form.location.data,
+            vacancies=int(form.vacancies.data) if form.vacancies.data.isdigit() else 1,
+            status='Open'
+        )
+        db.session.add(job)
+        db.session.commit()
+        flash('Job created successfully!', 'success')
+        return redirect(url_for('my_jobs'))
+
+    return render_template('create_job.html', form=form)
+
+
+@app.route('/job/edit/<int:job_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('employer')
+def edit_job(job_id):
+    job = Job.query.get_or_404(job_id)
+    # Ensure the job belongs to the current employer
+    employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+    if not employer or job.employer_id != employer.id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('my_jobs'))
+
+    form = JobForm(obj=job)
+    if form.validate_on_submit():
+        job.job_name = form.job_name.data
+        job.job_description = form.job_description.data
+        job.job_type = form.job_type.data
+        job.committed_salary = form.committed_salary.data
+        job.location = form.location.data
+        job.vacancies = int(form.vacancies.data) if form.vacancies.data.isdigit() else job.vacancies
+        db.session.commit()
+        flash('Job updated successfully!', 'success')
+        return redirect(url_for('my_jobs'))
+
+    # Pre‑populate vacancies as string for the form
+    if request.method == 'GET':
+        form.vacancies.data = str(job.vacancies)
+
+    return render_template('create_job.html', form=form, edit_mode=True, job=job)
+
+
+@app.route('/job/delete/<int:job_id>')
+@login_required
+@role_required('employer')
+def delete_job(job_id):
+    job = Job.query.get_or_404(job_id)
+    employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+    if not employer or job.employer_id != employer.id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('my_jobs'))
+
+    db.session.delete(job)
+    db.session.commit()
+    flash('Job deleted.', 'success')
+    return redirect(url_for('my_jobs'))
+
+
+@app.route('/my-jobs')
+@login_required
+@role_required('employer')
+def my_jobs():
+    employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+    if not employer:
+        flash('Please complete your business profile first.', 'warning')
+        return redirect(url_for('employer_profile'))
+
+    jobs = Job.query.filter_by(employer_id=employer.id).order_by(Job.created_at.desc()).all()
+    return render_template('my_jobs.html', jobs=jobs)
 
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {

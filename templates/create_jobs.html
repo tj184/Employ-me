@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
+        {% if edit_mode %}Edit Job{% else %}Create Job{% endif %}
+    </h2>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <form method="POST" novalidate>
+                {{ form.hidden_tag() }}
+
+                <h5 class="section-title"><i class="fas fa-briefcase me-2"></i>Job Details</h5>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">{{ form.job_name.label.text }} <span class="text-danger">*</span></label>
+                    {{ form.job_name(class="form-control-dark", placeholder="e.g., Delivery Boy, Sales Executive") }}
+                    {% for err in form.job_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">{{ form.job_description.label.text }} <span class="text-danger">*</span></label>
+                    {{ form.job_description(class="form-control-dark", rows="5", placeholder="Describe the role, responsibilities, and requirements...") }}
+                    {% for err in form.job_description.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">{{ form.job_type.label.text }} <span class="text-danger">*</span></label>
+                        {{ form.job_type(class="form-select-dark") }}
+                        {% for err in form.job_type.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">{{ form.vacancies.label.text }} <span class="text-danger">*</span></label>
+                        {{ form.vacancies(class="form-control-dark", placeholder="e.g., 5") }}
+                        {% for err in form.vacancies.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">{{ form.committed_salary.label.text }} <span class="text-danger">*</span></label>
+                        {{ form.committed_salary(class="form-control-dark", placeholder="e.g., ₹15,000 – ₹25,000/month") }}
+                        {% for err in form.committed_salary.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">{{ form.location.label.text }} <span class="text-danger">*</span></label>
+                        {{ form.location(class="form-control-dark", placeholder="e.g., Mumbai, Delhi") }}
+                        {% for err in form.location.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    {{ form.submit(class="btn btn-primary-gradient px-5") }}
+                    <a href="{{ url_for('my_jobs') }}" class="btn btn-outline-soft ms-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    .section-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        color: var(--text-primary);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .form-label-custom {
+        font-weight: 500;
+        color: #CBD5E1;
+        margin-bottom: 6px;
+    }
+    .form-control-dark,
+    .form-select-dark {
+        background: rgba(15, 15, 30, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: #F1F5F9;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    .form-control-dark:focus,
+    .form-select-dark:focus {
+        background: rgba(20, 20, 45, 0.8);
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+        color: #fff;
+        outline: none;
+    }
+    .form-select-dark {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+    }
+</style>
+{% endblock %}

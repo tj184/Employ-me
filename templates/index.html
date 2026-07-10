@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
     {% if current_user.is_authenticated %}
         <!-- ===== LOGGED IN – Dynamic role-based hero ===== -->
@@ -19,6 +18,13 @@
                         </a>
                         <a href="{{ url_for('employer_profile') }}" class="btn btn-white btn-lg px-5 py-3">
                             <i class="fas fa-building"></i> My Information
+                        </a>
+                        <!-- NEW buttons for job management -->
+                        <a href="{{ url_for('create_job') }}" class="btn btn-white btn-lg px-5 py-3">
+                            <i class="fas fa-plus-circle"></i> Create Job
+                        </a>
+                        <a href="{{ url_for('my_jobs') }}" class="btn btn-white btn-lg px-5 py-3">
+                            <i class="fas fa-list-alt"></i> My Jobs
                         </a>
                     </div>
                 {% endif %}
@@ -49,7 +55,6 @@
             </div>
         </div>
     {% endif %}
-
     <!-- ===== HOW IT WORKS SECTION – Always visible, adapts to role ===== -->
     <section id="how-it-works" class="py-5 mt-4">
         <div class="container">
