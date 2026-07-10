@@ -25,6 +25,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
+with app.app_context():
+    db.create_all()
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
