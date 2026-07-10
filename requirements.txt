@@ -6,3 +6,4 @@ email-validator==2.1.0
 gunicorn
 python-dotenv
 requests
+psycopg2-binary
