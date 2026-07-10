@@ -709,6 +709,18 @@ def create_job():
         flash('Please complete your business profile first.', 'warning')
         return redirect(url_for('employer_profile'))
 
+    # ---- Verification gate ----
+    if not employer.verified:
+        return redirect(url_for('verification_pending'))
+
+    # ---- Rate limiter: max 3 jobs per 24 hours ----
+    since = datetime.utcnow() - timedelta(hours=24)
+    job_count = Job.query.filter(Job.employer_id == employer.id,
+                                 Job.created_at >= since).count()
+    if job_count >= 3:
+        flash('You have reached the maximum of 3 job postings in 24 hours. Please try again later.', 'danger')
+        return redirect(url_for('my_jobs'))
+
     form = JobForm()
     if form.validate_on_submit():
         job = Job(
@@ -740,11 +752,16 @@ def create_job():
 @role_required('employer')
 def edit_job(job_id):
     job = Job.query.get_or_404(job_id)
-    # Ensure the job belongs to the current employer
     employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+
+    # Ensure the job belongs to the current employer
     if not employer or job.employer_id != employer.id:
         flash('Access denied.', 'danger')
         return redirect(url_for('my_jobs'))
+
+    # ---- Verification gate ----
+    if not employer.verified:
+        return redirect(url_for('verification_pending'))
 
     form = JobForm(obj=job)
     if form.validate_on_submit():
@@ -771,9 +788,14 @@ def edit_job(job_id):
 def delete_job(job_id):
     job = Job.query.get_or_404(job_id)
     employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+
     if not employer or job.employer_id != employer.id:
         flash('Access denied.', 'danger')
         return redirect(url_for('my_jobs'))
+
+    # ---- Verification gate ----
+    if not employer.verified:
+        return redirect(url_for('verification_pending'))
 
     db.session.delete(job)
     db.session.commit()
@@ -790,9 +812,12 @@ def my_jobs():
         flash('Please complete your business profile first.', 'warning')
         return redirect(url_for('employer_profile'))
 
+    # ---- Verification gate ----
+    if not employer.verified:
+        return redirect(url_for('verification_pending'))
+
     jobs = Job.query.filter_by(employer_id=employer.id).order_by(Job.created_at.desc()).all()
     return render_template('my_jobs.html', jobs=jobs)
-
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/admin': admin_app
