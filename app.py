@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired
 from config import Config
-from models import db, User, JobSeekerProfile, EmployerProfile, Job
+from models import db, User, JobSeekerProfile, EmployerProfile, Job,JobApplication
 from forms import LoginForm, SignupForm, ProfileForm, EmployerForm, INDIAN_CITIES, SKILLS_CHOICES,JobForm
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from admin import admin_app 
@@ -793,11 +793,11 @@ def delete_job(job_id):
         flash('Access denied.', 'danger')
         return redirect(url_for('my_jobs'))
 
-    # ---- Verification gate ----
     if not employer.verified:
         return redirect(url_for('verification_pending'))
 
-    db.session.delete(job)
+    # Soft‑delete
+    job.deleted = True
     db.session.commit()
     flash('Job deleted.', 'success')
     return redirect(url_for('my_jobs'))
@@ -811,13 +811,55 @@ def my_jobs():
     if not employer:
         flash('Please complete your business profile first.', 'warning')
         return redirect(url_for('employer_profile'))
-
-    # ---- Verification gate ----
     if not employer.verified:
         return redirect(url_for('verification_pending'))
 
-    jobs = Job.query.filter_by(employer_id=employer.id).order_by(Job.created_at.desc()).all()
+    jobs = Job.query.filter_by(employer_id=employer.id, deleted=False).order_by(Job.created_at.desc()).all()
     return render_template('my_jobs.html', jobs=jobs)
+
+@app.route('/jobs')
+@login_required
+@role_required('jobseeker')
+def job_list():
+    jobs = Job.query.filter_by(status='Open', deleted=False).order_by(Job.created_at.desc()).all()
+    return render_template('jobs_list.html', jobs=jobs)
+
+@app.route('/job/apply/<int:job_id>')
+@login_required
+@role_required('jobseeker')
+def apply_job(job_id):
+    job = Job.query.get_or_404(job_id)
+    # Check if already applied
+    already = JobApplication.query.filter_by(job_id=job.id, applicant_id=current_user.id).first()
+    if already:
+        flash('You have already applied to this job.', 'info')
+        return redirect(url_for('job_list'))
+
+    application = JobApplication(job_id=job.id, applicant_id=current_user.id)
+    db.session.add(application)
+    db.session.commit()
+    flash('Application submitted successfully!', 'success')
+    return redirect(url_for('my_applications'))
+
+@app.route('/my-applications')
+@login_required
+@role_required('jobseeker')
+def my_applications():
+    applications = JobApplication.query.filter_by(applicant_id=current_user.id).order_by(JobApplication.applied_at.desc()).all()
+    return render_template('my_applications.html', applications=applications)
+
+@app.route('/employer/applicants/<int:job_id>')
+@login_required
+@role_required('employer')
+def view_applicants(job_id):
+    job = Job.query.get_or_404(job_id)
+    employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+    if not employer or job.employer_id != employer.id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('my_jobs'))
+
+    applications = JobApplication.query.filter_by(job_id=job.id).all()
+    return render_template('applicants.html', job=job, applications=applications)
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/admin': admin_app
