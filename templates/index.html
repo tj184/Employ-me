@@ -5,11 +5,19 @@
         <div class="dashboard-hero {% if current_user.role == 'jobseeker' %}jobseeker{% else %}employer{% endif %}">
             <div class="container text-center py-3">
                 <h1 class="display-4 fw-bold">Welcome back, {{ current_user.name }}!</h1>
-                {% if current_user.role == 'jobseeker' %}
+                 {% if current_user.role == 'jobseeker' %}
                     <p class="lead">Your next opportunity is just a click away.</p>
-                    <a href="{{ url_for('jobseeker_dashboard') }}" class="btn btn-white btn-lg px-5 py-3 mt-3">
-                        <i class="fas fa-user-cog"></i> My Dashboard
-                    </a>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap mt-3">
+                        <a href="{{ url_for('jobseeker_dashboard') }}" class="btn btn-white btn-lg px-5 py-3">
+                            <i class="fas fa-user-cog"></i> My Dashboard
+                        </a>
+                        <a href="{{ url_for('job_list') }}" class="btn btn-white btn-lg px-5 py-3">
+                            <i class="fas fa-briefcase"></i> Browse Jobs
+                        </a>
+                        <a href="{{ url_for('my_applications') }}" class="btn btn-white btn-lg px-5 py-3">
+                            <i class="fas fa-list-check"></i> My Applications
+                        </a>
+                    </div>
                 {% else %}
                     <p class="lead">Discover top talent ready to work.</p>
                     <div class="d-flex justify-content-center gap-3 flex-wrap mt-3">

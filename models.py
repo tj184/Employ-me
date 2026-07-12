@@ -55,6 +55,9 @@ class JobSeekerProfile(db.Model):
     profile_pic = db.Column(db.String(200))
     aadhar_card = db.Column(db.String(200))
 
+    # Payment status (default 'failed' until payment is completed)
+    payment_status = db.Column(db.String(20), default='failed', nullable=False)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     verified = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -83,6 +86,9 @@ class EmployerProfile(db.Model):
     # Images
     profile_pic = db.Column(db.String(200))   # business profile picture
 
+    # Payment status (default 'failed' until payment is completed)
+    payment_status = db.Column(db.String(20), default='failed', nullable=False)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -104,7 +110,7 @@ class Job(db.Model):
     location = db.Column(db.String(200))
     vacancies = db.Column(db.Integer, default=1)
     status = db.Column(db.String(20), default='Open')
-    deleted = db.Column(db.Boolean, default=False, nullable=False)   # <-- new column
+    deleted = db.Column(db.Boolean, default=False, nullable=False)   # <-- soft delete
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -112,6 +118,7 @@ class Job(db.Model):
     employer = db.relationship('EmployerProfile', backref='jobs')
     # No cascade – applications stay alive even when job is soft‑deleted
     applications = db.relationship('JobApplication', backref='job')
+
 
 class JobApplication(db.Model):
     id = db.Column(db.Integer, primary_key=True)

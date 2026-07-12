@@ -15,6 +15,7 @@
             <div class="card-modern p-4 h-100">
                 <h5 class="card-title" style="color: #F8FAFC;">{{ job.job_name }}</h5>
                 <p class="text-secondary small mb-2">{{ job.employer_name }} · {{ job.location }}</p>
+                <p class="text-secondary small mb-1">{{ job.employer_address }}, {{ job.employer_city }}, {{ job.employer_state }} - {{ job.employer_pincode }}</p>
                 <p class="text-secondary small mb-3">{{ job.job_type }} · {{ job.committed_salary }}</p>
                 <p class="text-secondary mb-3" style="font-size: 0.9rem;">{{ job.job_description[:100] }}...</p>
                 <span class="badge bg-success mb-3">{{ job.vacancies }} vacancy(ies)</span>
@@ -29,7 +30,7 @@
     {% else %}
         <div class="col-12">
             <div class="alert-modern alert-info text-center py-4">
-                <i class="fas fa-info-circle me-2"></i> No jobs available at the moment.
+                <i class="fas fa-info-circle me-2"></i> No new jobs available at the moment.
             </div>
         </div>
     {% endif %}

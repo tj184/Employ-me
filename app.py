@@ -821,7 +821,16 @@ def my_jobs():
 @login_required
 @role_required('jobseeker')
 def job_list():
-    jobs = Job.query.filter_by(status='Open', deleted=False).order_by(Job.created_at.desc()).all()
+    # Get IDs of jobs the current user has already applied to
+    applied_job_ids = [
+        app.job_id for app in JobApplication.query.filter_by(applicant_id=current_user.id).all()
+    ]
+    # Fetch open, non‑deleted jobs that are NOT in the applied list
+    jobs = Job.query.filter(
+        Job.status == 'Open',
+        Job.deleted == False,
+        ~Job.id.in_(applied_job_ids) if applied_job_ids else True  # exclude applied jobs
+    ).order_by(Job.created_at.desc()).all()
     return render_template('jobs_list.html', jobs=jobs)
 
 @app.route('/job/apply/<int:job_id>')
