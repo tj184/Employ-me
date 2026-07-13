@@ -17,7 +17,7 @@ def seed():
         # db.drop_all()
         # db.create_all()
 
-        # ----- 1. Create Jobseekers -----
+        # ----- 1. Create Jobseekers (6 entries, at least 2 with pincode 560100) -----
         js_data = [
             {
                 "email": "rajesh@example.com",
@@ -29,7 +29,7 @@ def seed():
                     "dob": date(1995, 5, 12),
                     "gender": "Male",
                     "address": "123 MG Road, Mumbai",
-                    "pincode": "400001",
+                    "pincode": "400001",          # not 560100
                     "mobile": "9876543210",
                     "father_husband_name": "Suresh Kumar",
                     "education_level": "Graduate",
@@ -53,7 +53,7 @@ def seed():
                     "dob": date(1998, 8, 23),
                     "gender": "Female",
                     "address": "45 Park Street, Delhi",
-                    "pincode": "110001",
+                    "pincode": "560100",          # changed to 560100 (was 110001)
                     "mobile": "9876543211",
                     "father_husband_name": "Ramesh Sharma",
                     "education_level": "Post Graduate",
@@ -139,6 +139,31 @@ def seed():
                     "verified": False,
                     "payment_status": "failed"
                 }
+            },
+            # NEW jobseeker (6th) with pincode 560100
+            {
+                "email": "kavya@example.com",
+                "password": "test1234",
+                "name": "Kavya Nair",
+                "profile": {
+                    "first_name": "Kavya",
+                    "last_name": "Nair",
+                    "dob": date(1997, 6, 10),
+                    "gender": "Female",
+                    "address": "22 Brigade Road, Bangalore",
+                    "pincode": "560100",          # 560100
+                    "mobile": "9876543215",
+                    "father_husband_name": "Mohan Nair",
+                    "education_level": "Graduate",
+                    "preferred_location1": "Bangalore",
+                    "preferred_location2": "Electronic City",
+                    "employment_type": "Full-time",
+                    "skills": "Administration, MS Office, English, Hindi, Kannada",
+                    "city": "Bangalore",
+                    "state": "Karnataka",
+                    "verified": True,
+                    "payment_status": "success"
+                }
             }
         ]
 
@@ -177,8 +202,9 @@ def seed():
                 )
                 db.session.add(profile)
 
-        # ----- 2. Create Employers -----
+        # ----- 2. Create Employers (8 entries, at least 3 with pincode 560100) -----
         emp_data = [
+            # Existing 3 (modified Amazon and Big Bazaar to pincode 560100)
             {
                 "email": "amazon@example.com",
                 "password": "test1234",
@@ -192,7 +218,7 @@ def seed():
                     "contact_person_phone": "9999999991",
                     "city": "Bangalore",
                     "state": "Karnataka",
-                    "pincode": "560001",
+                    "pincode": "560100",          # changed to 560100 (was 560001)
                     "verified": True,
                     "payment_status": "success",
                     "dob": date(1985, 1, 1)
@@ -211,7 +237,7 @@ def seed():
                     "contact_person_phone": "9999999992",
                     "city": "Mumbai",
                     "state": "Maharashtra",
-                    "pincode": "400001",
+                    "pincode": "560100",          # changed to 560100 (was 400001)
                     "verified": True,
                     "payment_status": "success",
                     "dob": date(1980, 5, 15)
@@ -230,10 +256,106 @@ def seed():
                     "contact_person_phone": "9999999993",
                     "city": "Pune",
                     "state": "Maharashtra",
-                    "pincode": "411001",
+                    "pincode": "411001",          # not 560100
                     "verified": False,
                     "payment_status": "failed",
                     "dob": date(1978, 9, 20)
+                }
+            },
+            # NEW employers (5 more) - 3 with pincode 560100, 2 with other pincodes
+            {
+                "email": "flipkart@example.com",
+                "password": "test1234",
+                "name": "Flipkart",
+                "profile": {
+                    "business_name": "Flipkart India Pvt Ltd",
+                    "business_address": "Embassy Tech Village, Bangalore",
+                    "gst_number": "29AAACF1234A1Z1",
+                    "business_type": "E-commerce",
+                    "contact_person_name": "Ravi Kumar",
+                    "contact_person_phone": "9999999994",
+                    "city": "Bangalore",
+                    "state": "Karnataka",
+                    "pincode": "560100",          # 560100
+                    "verified": True,
+                    "payment_status": "success",
+                    "dob": date(1987, 7, 19)
+                }
+            },
+            {
+                "email": "swiggy@example.com",
+                "password": "test1234",
+                "name": "Swiggy",
+                "profile": {
+                    "business_name": "Swiggy Food Delivery",
+                    "business_address": "HSR Layout, Bangalore",
+                    "gst_number": "29AAACS1234A1Z2",
+                    "business_type": "Food Delivery",
+                    "contact_person_name": "Meera Iyer",
+                    "contact_person_phone": "9999999995",
+                    "city": "Bangalore",
+                    "state": "Karnataka",
+                    "pincode": "560100",          # 560100
+                    "verified": True,
+                    "payment_status": "success",
+                    "dob": date(1990, 3, 12)
+                }
+            },
+            {
+                "email": "zomato@example.com",
+                "password": "test1234",
+                "name": "Zomato",
+                "profile": {
+                    "business_name": "Zomato Media Pvt Ltd",
+                    "business_address": "Indiranagar, Bangalore",
+                    "gst_number": "29AAACZ1234A1Z3",
+                    "business_type": "Food Tech",
+                    "contact_person_name": "Amit Singh",
+                    "contact_person_phone": "9999999996",
+                    "city": "Bangalore",
+                    "state": "Karnataka",
+                    "pincode": "560100",          # 560100 (now we have at least 3 employers with 560100)
+                    "verified": False,
+                    "payment_status": "pending",
+                    "dob": date(1988, 11, 5)
+                }
+            },
+            {
+                "email": "adani@example.com",
+                "password": "test1234",
+                "name": "Adani Group",
+                "profile": {
+                    "business_name": "Adani Enterprises Ltd",
+                    "business_address": "Shantigram, Ahmedabad",
+                    "gst_number": "24AAACA1234A1Z4",
+                    "business_type": "Infrastructure",
+                    "contact_person_name": "Gautam Shah",
+                    "contact_person_phone": "9999999997",
+                    "city": "Ahmedabad",
+                    "state": "Gujarat",
+                    "pincode": "380009",          # not 560100
+                    "verified": True,
+                    "payment_status": "success",
+                    "dob": date(1975, 4, 25)
+                }
+            },
+            {
+                "email": "reliance@example.com",
+                "password": "test1234",
+                "name": "Reliance Retail",
+                "profile": {
+                    "business_name": "Reliance Retail Ltd",
+                    "business_address": "Maker Chambers, Mumbai",
+                    "gst_number": "27AAACR1234A1Z5",
+                    "business_type": "Retail",
+                    "contact_person_name": "Nisha Sharma",
+                    "contact_person_phone": "9999999998",
+                    "city": "Mumbai",
+                    "state": "Maharashtra",
+                    "pincode": "400021",          # not 560100
+                    "verified": False,
+                    "payment_status": "failed",
+                    "dob": date(1982, 8, 30)
                 }
             }
         ]
@@ -269,10 +391,11 @@ def seed():
 
         db.session.commit()  # flush all users and profiles
 
-        # ----- 3. Create Jobs -----
-        # Get employer profiles
+        # ----- 3. Create Jobs (same as before, but we can add more jobs from new employers if needed) -----
+        # Get employer profiles (we'll pick some existing ones to keep job creation simple)
         emp_amazon = EmployerProfile.query.filter_by(business_name="Amazon India Pvt Ltd").first()
         emp_bigbazaar = EmployerProfile.query.filter_by(business_name="Big Bazaar Retail Ltd").first()
+        emp_flipkart = EmployerProfile.query.filter_by(business_name="Flipkart India Pvt Ltd").first()  # new
 
         if emp_amazon and not Job.query.filter_by(employer_id=emp_amazon.id).first():
             jobs = [
@@ -354,13 +477,38 @@ def seed():
             for j in jobs:
                 db.session.add(j)
 
+        # Optionally add jobs from Flipkart (new employer)
+        if emp_flipkart and not Job.query.filter_by(employer_id=emp_flipkart.id).first():
+            jobs = [
+                Job(
+                    employer_id=emp_flipkart.id,
+                    employer_name=emp_flipkart.business_name,
+                    employer_address=emp_flipkart.business_address,
+                    employer_mobile=emp_flipkart.contact_person_phone,
+                    employer_city=emp_flipkart.city,
+                    employer_state=emp_flipkart.state,
+                    employer_pincode=emp_flipkart.pincode,
+                    job_name="Warehouse Associate",
+                    job_description="Pack and ship orders, manage inventory in the warehouse.",
+                    job_type="Full-time",
+                    committed_salary="₹16,000 – ₹20,000/month",
+                    location="Bangalore",
+                    vacancies=4,
+                    status="Open",
+                    deleted=False
+                )
+            ]
+            for j in jobs:
+                db.session.add(j)
+
         db.session.commit()
 
-        # ----- 4. Create Applications -----
+        # ----- 4. Create Applications (same as before, but we can add more applications) -----
         job1 = Job.query.filter_by(job_name="Delivery Associate").first()
         job2 = Job.query.filter_by(job_name="Customer Service Executive").first()
         job3 = Job.query.filter_by(job_name="Store Helper").first()
         job4 = Job.query.filter_by(job_name="Cashier").first()
+        job5 = Job.query.filter_by(job_name="Warehouse Associate").first()  # new job
 
         # Get some jobseeker users
         js1 = User.query.filter_by(email="rajesh@example.com").first()
@@ -368,6 +516,7 @@ def seed():
         js3 = User.query.filter_by(email="amit@example.com").first()
         js4 = User.query.filter_by(email="neha@example.com").first()
         js5 = User.query.filter_by(email="vikram@example.com").first()
+        js6 = User.query.filter_by(email="kavya@example.com").first()  # new
 
         # Check if applications already exist to avoid duplicates
         if js1 and job1 and not JobApplication.query.filter_by(job_id=job1.id, applicant_id=js1.id).first():
@@ -380,6 +529,9 @@ def seed():
             db.session.add(JobApplication(job_id=job2.id, applicant_id=js4.id, status="Pending"))
         if js5 and job1 and not JobApplication.query.filter_by(job_id=job1.id, applicant_id=js5.id).first():
             db.session.add(JobApplication(job_id=job1.id, applicant_id=js5.id, status="Pending"))
+        # New application for the new jobseeker
+        if js6 and job5 and not JobApplication.query.filter_by(job_id=job5.id, applicant_id=js6.id).first():
+            db.session.add(JobApplication(job_id=job5.id, applicant_id=js6.id, status="Pending"))
 
         db.session.commit()
 

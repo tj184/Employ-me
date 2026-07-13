@@ -855,7 +855,6 @@ def my_jobs():
 @role_required('jobseeker')
 @payment_required
 def job_list():
-    # Get IDs of jobs the current user has already applied to
     profile = JobSeekerProfile.query.filter_by(user_id=current_user.id).first()
     if not profile or not profile.verified:
         return redirect(url_for('jobseeker_verification_pending'))
@@ -863,13 +862,52 @@ def job_list():
     applied_job_ids = [
         app.job_id for app in JobApplication.query.filter_by(applicant_id=current_user.id).all()
     ]
-    # Fetch open, non‑deleted jobs that are NOT in the applied list
-    jobs = Job.query.filter(
+
+    jobs_query = Job.query.filter(
         Job.status == 'Open',
         Job.deleted == False,
-        ~Job.id.in_(applied_job_ids) if applied_job_ids else True  # exclude applied jobs
-    ).order_by(Job.created_at.desc()).all()
-    return render_template('jobs_list.html', jobs=jobs)
+        ~Job.id.in_(applied_job_ids) if applied_job_ids else True
+    )
+
+    # ----- read filter params -----
+    use_pincode = request.args.get('use_pincode', '0') == '1'
+    job_types_str = request.args.get('job_types', '')
+    city = request.args.get('city', '').strip()
+    state = request.args.get('state', '').strip()
+    min_vacancies = request.args.get('min_vacancies', '').strip()
+    search = request.args.get('search', '').strip()
+
+    # ----- apply filters -----
+    from filters import (filter_by_pincode, filter_by_job_types,
+                         filter_by_city, filter_by_state,
+                         filter_by_min_vacancies, filter_by_search)
+
+    if use_pincode:
+        jobs_query = filter_by_pincode(jobs_query, profile)
+    if job_types_str:
+        jobs_query = filter_by_job_types(jobs_query, job_types_str)
+    if city:
+        jobs_query = filter_by_city(jobs_query, city)
+    if state:
+        jobs_query = filter_by_state(jobs_query, state)
+    if min_vacancies:
+        jobs_query = filter_by_min_vacancies(jobs_query, min_vacancies)
+    if search:
+        jobs_query = filter_by_search(jobs_query, search)
+
+    jobs = jobs_query.order_by(Job.created_at.desc()).all()
+
+    # Pass the Indian cities list to the template for the dropdown
+    from forms import INDIAN_CITIES
+    return render_template('jobs_list.html',
+                           jobs=jobs,
+                           use_pincode=use_pincode,
+                           job_types=job_types_str,
+                           selected_city=city,
+                           selected_state=state,
+                           min_vacancies=min_vacancies,
+                           search=search,
+                           cities=INDIAN_CITIES)
 
 @app.route('/job/apply/<int:job_id>')
 @login_required
