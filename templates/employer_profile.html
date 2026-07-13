@@ -153,6 +153,17 @@
                     <button type="submit" id="save-btn" class="btn btn-primary-gradient px-5">
                         <i class="fas fa-save me-2"></i> Save Profile
                     </button>
+                                <!-- Payment Button (only if profile exists and not paid) -->
+            {% if profile and profile.payment_status != 'success' %}
+                <hr>
+                <div class="text-center mt-3">
+                    <p class="text-warning mb-2"><i class="fas fa-exclamation-circle"></i> Payment Required</p>
+                    <a href="{{ url_for('simulate_payment') }}" class="btn btn-primary-gradient btn-sm px-4">
+                        <i class="fas fa-credit-card me-1"></i> Pay Now
+                    </a>
+                    <small class="text-secondary d-block mt-2">Simulated payment – click to unlock all features</small>
+                </div>
+            {% endif %}
                 </div>
             </form>
         </div>

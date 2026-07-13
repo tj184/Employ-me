@@ -252,22 +252,33 @@
         </div>
     </div>
 
-    <!-- Profile Preview Sidebar -->
-    <div class="col-md-4">
-        <div class="card-modern p-4 sticky-top" style="top: 100px;">
-            <h5 class="section-title"><i class="fas fa-eye me-2"></i>Profile Preview</h5>
-            {% if profile %}
-                <p><strong>Name:</strong> {{ profile.first_name }} {{ profile.middle_name or '' }} {{ profile.last_name }}</p>
-                <p><strong>Location:</strong> {{ profile.preferred_location1 }}</p>
-                <p><strong>Education:</strong> {{ profile.education_level }}{% if profile.education_other %} - {{ profile.education_other }}{% endif %}</p>
-                <p><strong>Employment:</strong> {{ profile.employment_type }}</p>
-            {% else %}
-                <div class="text-center py-4">
-                    <i class="fas fa-user-edit fa-3x mb-3" style="color: rgba(168,85,247,0.3);"></i>
-                    <p class="text-secondary">Complete the form to see your profile preview.</p>
+ <!-- Profile Preview Sidebar -->
+<div class="col-md-4">
+    <div class="card-modern p-4 sticky-top" style="top: 100px;">
+        <h5 class="section-title"><i class="fas fa-eye me-2"></i>Profile Preview</h5>
+        {% if profile %}
+            <p><strong>Name:</strong> {{ profile.first_name }} {{ profile.middle_name or '' }} {{ profile.last_name }}</p>
+            <p><strong>Location:</strong> {{ profile.preferred_location1 }}</p>
+            <p><strong>Education:</strong> {{ profile.education_level }}{% if profile.education_other %} - {{ profile.education_other }}{% endif %}</p>
+            <p><strong>Employment:</strong> {{ profile.employment_type }}</p>
+
+            <!-- Payment Button (only if not paid) -->
+            {% if profile.payment_status != 'success' %}
+                <hr>
+                <div class="text-center mt-3">
+                    <p class="text-warning mb-2"><i class="fas fa-exclamation-circle"></i> Payment Required</p>
+                    <a href="{{ url_for('simulate_payment') }}" class="btn btn-primary-gradient btn-sm px-4">
+                        <i class="fas fa-credit-card me-1"></i> Pay Now
+                    </a>
+                    <small class="text-secondary d-block mt-2">Simulated payment – click to unlock all features</small>
                 </div>
             {% endif %}
-        </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-user-edit fa-3x mb-3" style="color: rgba(168,85,247,0.3);"></i>
+                <p class="text-secondary">Complete the form to see your profile preview.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 

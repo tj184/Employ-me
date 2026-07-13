@@ -49,7 +49,7 @@ def save_image(file):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))   # instead of User.query.get
 
 def role_required(role):
     def decorator(func):
@@ -348,9 +348,31 @@ def employer_profile():
                            form=form,
                            profile=profile,
                            locked_fields=locked_fields)
+
+def payment_required(f):
+    """Redirects user if payment_status is not 'success'."""
+    from functools import wraps
+    @wraps(f)
+    @login_required
+    def decorated(*args, **kwargs):
+        if current_user.role == 'jobseeker':
+            profile = JobSeekerProfile.query.filter_by(user_id=current_user.id).first()
+        else:
+            profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+
+        if not profile or profile.payment_status != 'success':
+            flash('Please complete the payment to access this feature.', 'warning')
+            if current_user.role == 'jobseeker':
+                return redirect(url_for('jobseeker_dashboard'))
+            else:
+                return redirect(url_for('employer_profile'))   # changed from 'index' to 'employer_profile'
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route('/hire')
 @login_required
 @role_required('employer')
+@payment_required
 def hire_dashboard():
     employer_profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
     if not employer_profile:
@@ -374,6 +396,7 @@ def verification_pending():
 @app.route('/view/<int:profile_id>')
 @login_required
 @role_required('employer')
+@payment_required
 def view_profile(profile_id):
     profile = JobSeekerProfile.query.get_or_404(profile_id)
     return render_template('view_profile.html', profile=profile)
@@ -703,6 +726,7 @@ def contact():
 @app.route('/job/create', methods=['GET', 'POST'])
 @login_required
 @role_required('employer')
+@payment_required
 def create_job():
     employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
     if not employer:
@@ -750,6 +774,7 @@ def create_job():
 @app.route('/job/edit/<int:job_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('employer')
+@payment_required
 def edit_job(job_id):
     job = Job.query.get_or_404(job_id)
     employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
@@ -785,6 +810,7 @@ def edit_job(job_id):
 @app.route('/job/delete/<int:job_id>')
 @login_required
 @role_required('employer')
+@payment_required
 def delete_job(job_id):
     job = Job.query.get_or_404(job_id)
     employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
@@ -806,6 +832,7 @@ def delete_job(job_id):
 @app.route('/my-jobs')
 @login_required
 @role_required('employer')
+@payment_required
 def my_jobs():
     employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
     if not employer:
@@ -820,6 +847,7 @@ def my_jobs():
 @app.route('/jobs')
 @login_required
 @role_required('jobseeker')
+@payment_required
 def job_list():
     # Get IDs of jobs the current user has already applied to
     applied_job_ids = [
@@ -836,6 +864,7 @@ def job_list():
 @app.route('/job/apply/<int:job_id>')
 @login_required
 @role_required('jobseeker')
+@payment_required
 def apply_job(job_id):
     job = Job.query.get_or_404(job_id)
     # Check if already applied
@@ -853,6 +882,7 @@ def apply_job(job_id):
 @app.route('/my-applications')
 @login_required
 @role_required('jobseeker')
+@payment_required
 def my_applications():
     applications = JobApplication.query.filter_by(applicant_id=current_user.id).order_by(JobApplication.applied_at.desc()).all()
     return render_template('my_applications.html', applications=applications)
@@ -860,6 +890,7 @@ def my_applications():
 @app.route('/employer/applicants/<int:job_id>')
 @login_required
 @role_required('employer')
+@payment_required
 def view_applicants(job_id):
     job = Job.query.get_or_404(job_id)
     employer = EmployerProfile.query.filter_by(user_id=current_user.id).first()
@@ -869,6 +900,33 @@ def view_applicants(job_id):
 
     applications = JobApplication.query.filter_by(job_id=job.id).all()
     return render_template('applicants.html', job=job, applications=applications)
+
+@app.route('/payment/simulate')
+@login_required
+def simulate_payment():
+    if current_user.role == 'jobseeker':
+        profile = JobSeekerProfile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            flash('Please complete your profile first.', 'danger')
+            return redirect(url_for('jobseeker_dashboard'))
+        profile.payment_status = 'success'
+        db.session.commit()
+        flash('Payment successful! You can now access all features.', 'success')
+        return redirect(url_for('jobseeker_dashboard'))
+
+    elif current_user.role == 'employer':
+        profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+        if not profile:
+            flash('Please complete your business profile first.', 'danger')
+            return redirect(url_for('employer_profile'))
+        profile.payment_status = 'success'
+        db.session.commit()
+        flash('Payment successful! You can now access all features.', 'success')
+        return redirect(url_for('employer_profile'))
+
+    flash('Access denied.', 'danger')
+    return redirect(url_for('index'))
+
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/admin': admin_app
