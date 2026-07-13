@@ -393,6 +393,12 @@ def hire_dashboard():
 def verification_pending():
     return render_template('verification_pending.html')
 
+@app.route('/jobseeker/verification-pending')
+@login_required
+@role_required('jobseeker')
+def jobseeker_verification_pending():
+    return render_template('jobseeker_verification_pending.html')
+
 @app.route('/view/<int:profile_id>')
 @login_required
 @role_required('employer')
@@ -850,6 +856,10 @@ def my_jobs():
 @payment_required
 def job_list():
     # Get IDs of jobs the current user has already applied to
+    profile = JobSeekerProfile.query.filter_by(user_id=current_user.id).first()
+    if not profile or not profile.verified:
+        return redirect(url_for('jobseeker_verification_pending'))
+
     applied_job_ids = [
         app.job_id for app in JobApplication.query.filter_by(applicant_id=current_user.id).all()
     ]
@@ -866,6 +876,10 @@ def job_list():
 @role_required('jobseeker')
 @payment_required
 def apply_job(job_id):
+    profile = JobSeekerProfile.query.filter_by(user_id=current_user.id).first()
+    if not profile or not profile.verified:
+        return redirect(url_for('jobseeker_verification_pending'))
+
     job = Job.query.get_or_404(job_id)
     # Check if already applied
     already = JobApplication.query.filter_by(job_id=job.id, applicant_id=current_user.id).first()
@@ -884,6 +898,9 @@ def apply_job(job_id):
 @role_required('jobseeker')
 @payment_required
 def my_applications():
+    profile = JobSeekerProfile.query.filter_by(user_id=current_user.id).first()
+    if not profile or not profile.verified:
+        return redirect(url_for('jobseeker_verification_pending'))
     applications = JobApplication.query.filter_by(applicant_id=current_user.id).order_by(JobApplication.applied_at.desc()).all()
     return render_template('my_applications.html', applications=applications)
 
