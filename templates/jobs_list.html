@@ -13,6 +13,77 @@
     </div>
 </div>
 
+<!-- ===== FILTER PANEL (always visible, works for both views) ===== -->
+<div class="card-modern p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0 text-primary-light"><i class="fas fa-filter me-2"></i>Filters <span class="text-secondary small">(apply to both list and map)</span></h6>
+        {% if use_pincode or job_types or selected_city or selected_state or min_vacancies or search %}
+            <a href="{{ url_for('job_list') }}" class="btn btn-sm btn-outline-light">
+                <i class="fas fa-redo me-1"></i> Clear All
+            </a>
+        {% endif %}
+    </div>
+    <form method="GET" action="{{ url_for('job_list') }}" class="row g-2">
+        <!-- pincode toggle -->
+        <div class="col-auto">
+            <div class="form-check form-check-dark mt-2">
+                <input class="form-check-input" type="checkbox" name="use_pincode" value="1" id="use_pincode"
+                       {% if use_pincode %}checked{% endif %}>
+                <label class="form-check-label" for="use_pincode">Pincode: {{ current_user.profile.pincode if current_user.profile else '' }}</label>
+            </div>
+        </div>
+        <!-- Job types as checkboxes -->
+        <div class="col-12">
+            <label class="text-secondary small mb-1">Job Type</label>
+            <div class="d-flex flex-wrap gap-2">
+                {% set all_types = ['Full-time','Part-time','Contract','Freelance','Internship'] %}
+                {% set active_types = job_types.split(',') if job_types else [] %}
+                {% for t in all_types %}
+                    <div class="form-check form-check-dark">
+                        <input class="form-check-input" type="checkbox" name="job_types" value="{{ t }}"
+                               id="type_{{ t }}" {% if t in active_types %}checked{% endif %}>
+                        <label class="form-check-label" for="type_{{ t }}">{{ t }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- city dropdown -->
+        <div class="col-md-3">
+            <label class="form-label-custom small">City</label>
+            <select class="form-select-dark" name="city">
+                <option value="">All Cities</option>
+                {% for c in cities %}
+                    <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- state text input -->
+        <div class="col-md-3">
+            <label class="form-label-custom small">State</label>
+            <input type="text" class="form-control-dark" name="state" placeholder="e.g. Maharashtra"
+                   value="{{ selected_state }}">
+        </div>
+        <!-- min vacancies -->
+        <div class="col-md-2">
+            <label class="form-label-custom small">Min Vacancies</label>
+            <input type="number" class="form-control-dark" name="min_vacancies" placeholder="1"
+                   value="{{ min_vacancies }}">
+        </div>
+        <!-- search -->
+        <div class="col-md-4">
+            <label class="form-label-custom small">Search</label>
+            <input type="text" class="form-control-dark" name="search" placeholder="Job title, skills, salary..."
+                   value="{{ search }}">
+        </div>
+        <!-- submit button -->
+        <div class="col-auto d-flex align-items-end">
+            <button type="submit" class="btn btn-primary-gradient btn-sm">
+                <i class="fas fa-check me-1"></i> Apply
+            </button>
+        </div>
+    </form>
+</div>
+
 <!-- ===== MAP SECTION ===== -->
 <div id="map-section" style="display:none;" class="mb-4">
     <div class="card-modern p-3">
@@ -34,81 +105,7 @@
     </div>
 </div>
 
-<!-- ===== FILTER PANEL (existing, only shown in list view) ===== -->
-<div id="filter-list-section">
-    <div class="card-modern p-3 mb-4">
-        <!-- ... existing filter panel code ... -->
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="mb-0 text-primary-light"><i class="fas fa-filter me-2"></i>Filters</h6>
-            {% if use_pincode or job_types or selected_city or selected_state or min_vacancies or search %}
-                <a href="{{ url_for('job_list') }}" class="btn btn-sm btn-outline-light">
-                    <i class="fas fa-redo me-1"></i> Clear All
-                </a>
-            {% endif %}
-        </div>
-        <form method="GET" action="{{ url_for('job_list') }}" class="row g-2">
-            <!-- pincode toggle -->
-            <div class="col-auto">
-                <div class="form-check form-check-dark mt-2">
-                    <input class="form-check-input" type="checkbox" name="use_pincode" value="1" id="use_pincode"
-                           {% if use_pincode %}checked{% endif %}>
-                    <label class="form-check-label" for="use_pincode">Pincode: {{ current_user.profile.pincode if current_user.profile else '' }}</label>
-                </div>
-            </div>
-            <!-- Job types as checkboxes -->
-            <div class="col-12">
-                <label class="text-secondary small mb-1">Job Type</label>
-                <div class="d-flex flex-wrap gap-2">
-                    {% set all_types = ['Full-time','Part-time','Contract','Freelance','Internship'] %}
-                    {% set active_types = job_types.split(',') if job_types else [] %}
-                    {% for t in all_types %}
-                        <div class="form-check form-check-dark">
-                            <input class="form-check-input" type="checkbox" name="job_types" value="{{ t }}"
-                                   id="type_{{ t }}" {% if t in active_types %}checked{% endif %}>
-                            <label class="form-check-label" for="type_{{ t }}">{{ t }}</label>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <!-- city dropdown -->
-            <div class="col-md-3">
-                <label class="form-label-custom small">City</label>
-                <select class="form-select-dark" name="city">
-                    <option value="">All Cities</option>
-                    {% for c in cities %}
-                        <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <!-- state text input -->
-            <div class="col-md-3">
-                <label class="form-label-custom small">State</label>
-                <input type="text" class="form-control-dark" name="state" placeholder="e.g. Maharashtra"
-                       value="{{ selected_state }}">
-            </div>
-            <!-- min vacancies -->
-            <div class="col-md-2">
-                <label class="form-label-custom small">Min Vacancies</label>
-                <input type="number" class="form-control-dark" name="min_vacancies" placeholder="1"
-                       value="{{ min_vacancies }}">
-            </div>
-            <!-- search -->
-            <div class="col-md-4">
-                <label class="form-label-custom small">Search</label>
-                <input type="text" class="form-control-dark" name="search" placeholder="Job title, skills, salary..."
-                       value="{{ search }}">
-            </div>
-            <!-- submit button -->
-            <div class="col-auto d-flex align-items-end">
-                <button type="submit" class="btn btn-primary-gradient btn-sm">
-                    <i class="fas fa-check me-1"></i> Apply
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ===== LIST VIEW (existing, hidden when map is active) ===== -->
+<!-- ===== LIST VIEW ===== -->
 <div id="list-section">
     <div class="row">
         {% if jobs %}
@@ -146,59 +143,17 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
-    .btn-outline-soft {
-        border: 1px solid rgba(168,85,247,0.3);
-        color: #CBD5E1;
-    }
-    .btn-outline-light {
-        border: 1px solid rgba(255,255,255,0.3);
-        color: #CBD5E1;
-        background: transparent;
-    }
-    .btn-outline-light:hover {
-        background: rgba(255,255,255,0.1);
-        color: #fff;
-    }
-    .form-label-custom.small {
-        font-size: 0.8rem;
-        color: #94A3B8;
-        margin-bottom: 2px;
-    }
-    .form-select-dark, .form-control-dark {
-        background: rgba(15,15,30,0.6);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-        color: #F1F5F9;
-        padding: 8px 10px;
-        font-size: 0.85rem;
-        transition: all 0.3s ease;
-    }
-    .form-select-dark:focus, .form-control-dark:focus {
-        background: rgba(20,20,45,0.8);
-        border-color: var(--primary);
-        box-shadow: 0 0 12px rgba(168,85,247,0.25);
-    }
-    .form-check-dark .form-check-input {
-        background-color: rgba(15,15,30,0.8);
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-    .form-check-dark .form-check-input:checked {
-        background-color: var(--primary);
-        border-color: var(--primary);
-    }
-    .form-check-dark .form-check-label {
-        color: #CBD5E1;
-        font-size: 0.85rem;
-    }
-    .btn-outline-purple {
-        border: 1px solid var(--primary);
-        color: var(--primary-light);
-        background: transparent;
-    }
-    .btn-outline-purple:hover {
-        background: var(--primary);
-        color: #fff;
-    }
+    .btn-outline-soft { border: 1px solid rgba(168,85,247,0.3); color: #CBD5E1; }
+    .btn-outline-light { border: 1px solid rgba(255,255,255,0.3); color: #CBD5E1; background: transparent; }
+    .btn-outline-light:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .form-label-custom.small { font-size: 0.8rem; color: #94A3B8; margin-bottom: 2px; }
+    .form-select-dark, .form-control-dark { background: rgba(15,15,30,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: #F1F5F9; padding: 8px 10px; font-size: 0.85rem; transition: all 0.3s ease; }
+    .form-select-dark:focus, .form-control-dark:focus { background: rgba(20,20,45,0.8); border-color: var(--primary); box-shadow: 0 0 12px rgba(168,85,247,0.25); }
+    .form-check-dark .form-check-input { background-color: rgba(15,15,30,0.8); border: 1px solid rgba(255,255,255,0.2); }
+    .form-check-dark .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
+    .form-check-dark .form-check-label { color: #CBD5E1; font-size: 0.85rem; }
+    .btn-outline-purple { border: 1px solid var(--primary); color: var(--primary-light); background: transparent; }
+    .btn-outline-purple:hover { background: var(--primary); color: #fff; }
 </style>
 
 <script>
@@ -206,7 +161,6 @@
 const toggleMapBtn = document.getElementById('toggle-map-btn');
 const mapSection = document.getElementById('map-section');
 const listSection = document.getElementById('list-section');
-const filterListSection = document.getElementById('filter-list-section');
 let mapViewActive = false;
 
 toggleMapBtn.addEventListener('click', function() {
@@ -214,19 +168,16 @@ toggleMapBtn.addEventListener('click', function() {
     if (mapViewActive) {
         mapSection.style.display = 'block';
         listSection.style.display = 'none';
-        filterListSection.style.display = 'none';
         toggleMapBtn.innerHTML = '<i class="fas fa-list me-1"></i> List View';
-        // Initialize map if needed
         if (!window.jobMap) {
             initJobMap();
         } else {
             window.jobMap.invalidateSize();
-            filterMarkersByRadius();  // re-filter
+            filterMarkersByRadius();
         }
     } else {
         mapSection.style.display = 'none';
         listSection.style.display = 'block';
-        filterListSection.style.display = 'block';
         toggleMapBtn.innerHTML = '<i class="fas fa-map-marked-alt me-1"></i> Map View';
     }
 });
@@ -241,7 +192,7 @@ const jobsData = {{ jobs_map | tojson | safe }};
 const radiusSelect = document.getElementById('radius-select');
 
 function haversineDistance(lat1, lng1, lat2, lng2) {
-    const R = 6371; // km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLng = (lng2 - lng1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -279,7 +230,6 @@ function initJobMap() {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(jobMap);
 
-    // Try to get user's location
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(pos) {
             userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
@@ -294,7 +244,10 @@ function initJobMap() {
                     fillOpacity: 0.8
                 }).addTo(jobMap).bindPopup('You are here');
             }
-            // Place job markers
+            // Clear existing markers
+            jobMarkers.forEach(m => m.remove());
+            jobMarkers = [];
+            // Place job markers from filtered data
             jobsData.forEach(job => {
                 const marker = L.marker([job.lat, job.lng]).bindPopup(`
                     <b>${job.name}</b><br>
@@ -304,11 +257,10 @@ function initJobMap() {
                     <a href="/job/apply/${job.id}" class="btn btn-sm btn-primary-gradient mt-1">Apply</a>
                 `);
                 jobMarkers.push(marker);
-                // We'll add them all, then filter by radius
                 marker.addTo(jobMap);
             });
             filterMarkersByRadius();
-            // Update distance text in popups
+            // Update distance text
             jobMarkers.forEach(marker => {
                 const jobLatLng = marker.getLatLng();
                 const dist = haversineDistance(userLatLng.lat, userLatLng.lng, jobLatLng.lat, jobLatLng.lng);
