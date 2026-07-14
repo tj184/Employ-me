@@ -281,30 +281,50 @@ def employer_profile():
     profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
     form = EmployerForm(obj=profile)
 
+    # Determine if this is effectively a "new" profile – either no profile exists,
+    # or one exists but the business_name is still empty (location was set first).
+    is_new = not profile or not profile.business_name
+
     locked_fields = [
         'business_name', 'business_address', 'gst_number', 'business_type',
         'city', 'state', 'pincode'
-    ] if profile else []
+    ] if profile and profile.business_name else []
 
-    if profile:
+    if profile and not is_new:
         for field_name in locked_fields:
             field = getattr(form, field_name, None)
             if field:
                 field.validators = [v for v in field.validators if not isinstance(v, DataRequired)]
 
     if form.validate_on_submit():
-        # ---- Extra validation for NEW profiles ----
-        if not profile and not form.profile_pic.data:
+        # ---- Extra validation for new profiles ----
+        if is_new and not form.profile_pic.data:
             flash('Business profile picture is required.', 'danger')
             return render_template('employer_profile.html',
                                    form=form,
                                    profile=profile,
                                    locked_fields=locked_fields)
 
-        if not profile:
+        # ---- Location mandatory for new profiles ----
+        if is_new:
+            # Check if location has been set (either via map before this form,
+            # or via the hidden field `location_confirmed` in the submitted form)
+            location_ok = (profile and profile.latitude is not None) or \
+                          request.form.get('location_confirmed') == '1'
+            if not location_ok:
+                flash('Please set your business location on the map before saving.', 'danger')
+                return render_template('employer_profile.html',
+                                       form=form,
+                                       profile=profile,
+                                       locked_fields=locked_fields)
+
+        # ---- Create or update profile ----
+        if is_new and not profile:
             profile = EmployerProfile(user_id=current_user.id)
             db.session.add(profile)
 
+        # Update fields (for new or editing)
+        if is_new:
             profile.business_name = form.business_name.data
             profile.business_address = form.business_address.data
             profile.gst_number = form.gst_number.data
@@ -834,7 +854,6 @@ def delete_job(job_id):
     flash('Job deleted.', 'success')
     return redirect(url_for('my_jobs'))
 
-
 @app.route('/my-jobs')
 @login_required
 @role_required('employer')
@@ -849,6 +868,7 @@ def my_jobs():
 
     jobs = Job.query.filter_by(employer_id=employer.id, deleted=False).order_by(Job.created_at.desc()).all()
     return render_template('my_jobs.html', jobs=jobs)
+
 
 @app.route('/jobs')
 @login_required
@@ -897,7 +917,27 @@ def job_list():
 
     jobs = jobs_query.order_by(Job.created_at.desc()).all()
 
-    # Pass the Indian cities list to the template for the dropdown
+    # ---- Build list of jobs with coordinates for the map ----
+    employer_ids = [job.employer_id for job in jobs]
+    employers = EmployerProfile.query.filter(EmployerProfile.id.in_(employer_ids)).all()
+    employer_coords = {e.id: (e.latitude, e.longitude) for e in employers if e.latitude is not None}
+
+    jobs_map = []
+    for job in jobs:
+        coords = employer_coords.get(job.employer_id)
+        if coords:
+            jobs_map.append({
+                'id': job.id,
+                'name': job.job_name,
+                'type': job.job_type,
+                'salary': job.committed_salary,
+                'address': job.employer_address,
+                'city': job.employer_city,
+                'lat': coords[0],
+                'lng': coords[1],
+                'description': job.job_description[:150]
+            })
+
     from forms import INDIAN_CITIES
     return render_template('jobs_list.html',
                            jobs=jobs,
@@ -907,7 +947,8 @@ def job_list():
                            selected_state=state,
                            min_vacancies=min_vacancies,
                            search=search,
-                           cities=INDIAN_CITIES)
+                           cities=INDIAN_CITIES,
+                           jobs_map=jobs_map)
 
 @app.route('/job/apply/<int:job_id>')
 @login_required
@@ -981,6 +1022,44 @@ def simulate_payment():
 
     flash('Access denied.', 'danger')
     return redirect(url_for('index'))
+
+@app.route('/employer/update-location', methods=['POST'])
+@login_required
+@role_required('employer')
+def update_location():
+    profile = EmployerProfile.query.filter_by(user_id=current_user.id).first()
+    if not profile:
+        # Create a minimal profile so we can store coordinates
+        profile = EmployerProfile(user_id=current_user.id)
+        db.session.add(profile)
+        # Fill required fields with temporary values
+        profile.business_name = ''
+        profile.business_address = ''
+        profile.gst_number = ''
+        profile.business_type = ''
+        profile.contact_person_name = ''
+        profile.contact_person_phone = ''
+        profile.dob = datetime.utcnow().date()   # FIXED: use datetime.utcnow().date()
+        db.session.flush()
+
+    data = request.get_json()
+    lat = data.get('latitude')
+    lng = data.get('longitude')
+
+    if lat is None or lng is None:
+        return jsonify({'success': False, 'message': 'Missing coordinates'}), 400
+
+    try:
+        lat = float(lat)
+        lng = float(lng)
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Invalid coordinates'}), 400
+
+    profile.latitude = lat
+    profile.longitude = lng
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Location updated'})
 
 # Mount the admin app under /admin
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {

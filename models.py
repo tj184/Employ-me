@@ -88,6 +88,8 @@ class EmployerProfile(db.Model):
 
     # Payment status (default 'failed' until payment is completed)
     payment_status = db.Column(db.String(20), default='failed', nullable=False)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

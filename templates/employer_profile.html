@@ -15,6 +15,8 @@
         <div class="card-modern p-4">
             <form method="POST" enctype="multipart/form-data" id="employer-profile-form" novalidate>
                 {{ form.hidden_tag() }}
+                <!-- Hidden input to signal that location has been confirmed -->
+                <input type="hidden" name="location_confirmed" id="location_confirmed" value="0">
 
                 <h5 class="section-title">
                     <i class="fas fa-building me-2"></i>Business Details
@@ -47,11 +49,10 @@
                     {% for err in form.business_address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
 
+                <!-- City / State / Pincode -->
                 <div class="row g-3 mt-2">
                     <div class="col-md-4">
-                        <label class="form-label-custom">
-                            {{ form.city.label.text }} <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label-custom">{{ form.city.label.text }} <span class="text-danger">*</span></label>
                         {% if 'city' in locked_fields %}
                             <input class="form-control-dark" value="{{ form.city.data or '' }}" readonly>
                         {% else %}
@@ -60,9 +61,7 @@
                         {% for err in form.city.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label-custom">
-                            {{ form.state.label.text }} <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label-custom">{{ form.state.label.text }} <span class="text-danger">*</span></label>
                         {% if 'state' in locked_fields %}
                             <input class="form-control-dark" value="{{ form.state.data or '' }}" readonly>
                         {% else %}
@@ -71,9 +70,7 @@
                         {% for err in form.state.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label-custom">
-                            {{ form.pincode.label.text }} <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label-custom">{{ form.pincode.label.text }} <span class="text-danger">*</span></label>
                         {% if 'pincode' in locked_fields %}
                             <input class="form-control-dark" value="{{ form.pincode.data or '' }}" readonly>
                         {% else %}
@@ -83,11 +80,29 @@
                     </div>
                 </div>
 
-                <div class="row g-3">
+                <!-- Business Location – mandatory for new, locked after save -->
+                <div class="mt-3">
+                    <label class="form-label-custom">
+                        Business Location <span class="text-danger">*</span>
+                    </label>
+                    {% if profile and profile.latitude is not none %}
+                        <!-- Locked: show coordinates -->
+                        <div class="d-flex align-items-center">
+                            <span class="text-success me-2"><i class="fas fa-map-marker-alt"></i></span>
+                            <span class="text-secondary small">
+                                Lat: {{ profile.latitude }}, Lng: {{ profile.longitude }}
+                            </span>
+                        </div>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-purple btn-sm" data-bs-toggle="modal" data-bs-target="#locationModal" id="open-location-btn">
+                            <i class="fas fa-map-marker-alt me-1"></i> Set Business Location on Map
+                        </button>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3 mt-3">
                     <div class="col-md-6">
-                        <label class="form-label-custom">
-                            {{ form.gst_number.label.text }} <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label-custom">{{ form.gst_number.label.text }} <span class="text-danger">*</span></label>
                         {% if 'gst_number' in locked_fields %}
                             <input class="form-control-dark" value="{{ form.gst_number.data or '' }}" readonly>
                         {% else %}
@@ -96,9 +111,7 @@
                         {% for err in form.gst_number.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label-custom">
-                            {{ form.business_type.label.text }} <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label-custom">{{ form.business_type.label.text }} <span class="text-danger">*</span></label>
                         {% if 'business_type' in locked_fields %}
                             <input class="form-control-dark" value="{{ form.business_type.data or '' }}" readonly>
                         {% else %}
@@ -112,30 +125,24 @@
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label-custom">
-                            {{ form.contact_person_name.label.text }} <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label-custom">{{ form.contact_person_name.label.text }} <span class="text-danger">*</span></label>
                         {{ form.contact_person_name(class="form-control-dark", placeholder="Full name") }}
                         {% for err in form.contact_person_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label-custom">
-                            {{ form.contact_person_phone.label.text }} <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label-custom">{{ form.contact_person_phone.label.text }} <span class="text-danger">*</span></label>
                         {{ form.contact_person_phone(class="form-control-dark", placeholder="10-digit mobile number") }}
                         {% for err in form.contact_person_phone.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                 </div>
 
                 <div class="mt-3">
-                    <label class="form-label-custom">
-                        {{ form.dob.label.text }} <span class="text-danger">*</span>
-                    </label>
+                    <label class="form-label-custom">{{ form.dob.label.text }} <span class="text-danger">*</span></label>
                     {{ form.dob(class="form-control-dark", type="date") }}
                     {% for err in form.dob.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                 </div>
 
-                <!-- Business Profile Picture (mandatory for new profiles, always editable) -->
+                <!-- Business Profile Picture -->
                 <div class="mt-4">
                     <label class="form-label-custom">
                         {{ form.profile_pic.label.text }}
@@ -153,89 +160,175 @@
                     <button type="submit" id="save-btn" class="btn btn-primary-gradient px-5">
                         <i class="fas fa-save me-2"></i> Save Profile
                     </button>
-                                <!-- Payment Button (only if profile exists and not paid) -->
-            {% if profile and profile.payment_status != 'success' %}
-                <hr>
-                <div class="text-center mt-3">
-                    <p class="text-warning mb-2"><i class="fas fa-exclamation-circle"></i> Payment Required</p>
-                    <a href="{{ url_for('simulate_payment') }}" class="btn btn-primary-gradient btn-sm px-4">
-                        <i class="fas fa-credit-card me-1"></i> Pay Now
-                    </a>
-                    <small class="text-secondary d-block mt-2">Simulated payment – click to unlock all features</small>
-                </div>
-            {% endif %}
+                    <!-- Payment Button (only if profile exists and not paid) -->
+                    {% if profile and profile.payment_status != 'success' %}
+                        <hr>
+                        <div class="text-center mt-3">
+                            <p class="text-warning mb-2"><i class="fas fa-exclamation-circle"></i> Payment Required</p>
+                            <a href="{{ url_for('simulate_payment') }}" class="btn btn-primary-gradient btn-sm px-4">
+                                <i class="fas fa-credit-card me-1"></i> Pay Now
+                            </a>
+                            <small class="text-secondary d-block mt-2">Simulated payment – click to unlock all features</small>
+                        </div>
+                    {% endif %}
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== LOCATION MAP MODAL ===== -->
+<div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: rgba(20,20,45,0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #E2E8F0;">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="locationModalLabel" style="font-family: var(--font-display); font-weight: 700;">Set Business Location</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Privacy Notice -->
+                <div class="alert alert-warning small py-2 mb-3" style="background: rgba(255,193,7,0.15); border: 1px solid rgba(255,193,7,0.3); border-radius: 12px;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Important:</strong> If your business location is your home, please choose a nearby landmark or public place instead of your exact home address for privacy. Otherwise, select your exact business location.
+                </div>
+                <div id="map" style="height: 400px; border-radius: 12px;"></div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-secondary">You can drag the pin up to 300 metres from your GPS location.</small>
+                    <button type="button" id="retry-gps-btn" class="btn btn-sm btn-outline-light" style="display:none;">
+                        <i class="fas fa-sync-alt me-1"></i> Retry GPS
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirm-location-btn" class="btn btn-primary-gradient" disabled>
+                    <i class="fas fa-check me-1"></i> Confirm Location
+                </button>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
-    .section-title {
-        font-family: var(--font-display);
-        font-weight: 700;
-        color: var(--text-primary);
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-    }
-    .form-label-custom {
-        font-weight: 500;
-        color: #CBD5E1;
-        margin-bottom: 6px;
-    }
-    .form-control-dark,
-    .form-select-dark {
-        background: rgba(15, 15, 30, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        color: #F1F5F9;
-        padding: 10px 14px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-    }
-    .form-control-dark:focus,
-    .form-select-dark:focus {
-        background: rgba(20, 20, 45, 0.8);
-        border-color: var(--primary);
-        box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
-        color: #fff;
-        outline: none;
-    }
-    .form-control-dark[readonly],
-    .form-select-dark[readonly] {
-        background: rgba(15, 15, 30, 0.3);
-        border-color: rgba(255, 255, 255, 0.03);
-        color: #94A3B8;
-        cursor: not-allowed;
-    }
-    .form-select-dark {
-        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 0.75rem center;
-        background-size: 16px 12px;
-    }
-    .img-thumbnail-modern {
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(20,20,40,0.5);
-        padding: 4px;
-        max-width: 150px;
-        display: block;
-    }
+    .section-title { font-family: var(--font-display); font-weight: 700; color: var(--text-primary); border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px; margin-bottom: 20px; }
+    .form-label-custom { font-weight: 500; color: #CBD5E1; margin-bottom: 6px; }
+    .form-control-dark, .form-select-dark { background: rgba(15,15,30,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: #F1F5F9; padding: 10px 14px; font-size: 0.95rem; transition: all 0.3s ease; }
+    .form-control-dark:focus, .form-select-dark:focus { background: rgba(20,20,45,0.8); border-color: var(--primary); box-shadow: 0 0 12px rgba(168,85,247,0.25); color: #fff; outline: none; }
+    .form-control-dark[readonly], .form-select-dark[readonly] { background: rgba(15,15,30,0.3); border-color: rgba(255,255,255,0.03); color: #94A3B8; cursor: not-allowed; }
+    .form-select-dark { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 16px 12px; }
+    .img-thumbnail-modern { border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: rgba(20,20,40,0.5); padding: 4px; max-width: 150px; display: block; }
+    .btn-outline-purple { border: 1px solid var(--primary); color: var(--primary-light); background: transparent; }
+    .btn-outline-purple:hover { background: var(--primary); color: #fff; }
 </style>
 
 <script>
-// Confirmation before saving
 document.addEventListener('DOMContentLoaded', function() {
+    // Existing profile form confirmation
     const form = document.getElementById('employer-profile-form');
     form.addEventListener('submit', function(e) {
         if (!confirm('Are you sure you want to save your business profile? Critical business details will be locked after saving.')) {
             e.preventDefault();
             return false;
         }
+    });
+
+    // ---- Map Modal Logic ----
+    let map, marker, userLocation;
+    const modal = document.getElementById('locationModal');
+    const confirmBtn = document.getElementById('confirm-location-btn');
+    const retryGpsBtn = document.getElementById('retry-gps-btn');
+    const locationConfirmedInput = document.getElementById('location_confirmed');
+
+    function requestGPS() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                userLocation = [position.coords.latitude, position.coords.longitude];
+                if (!map) return; // map not initialized yet
+                map.setView(userLocation, 15);
+                if (marker) {
+                    marker.setLatLng(userLocation);
+                } else {
+                    marker = L.marker(userLocation, { draggable: true }).addTo(map);
+                    marker.bindPopup("Drag to adjust (within 300m)").openPopup();
+                }
+                marker.on('dragend', function() {
+                    const newPos = marker.getLatLng();
+                    const dist = map.distance(userLocation, [newPos.lat, newPos.lng]);
+                    if (dist > 300) {
+                        alert('You can only move the pin within 300 metres of your GPS location.');
+                        marker.setLatLng(userLocation);
+                    }
+                });
+                confirmBtn.disabled = false;
+                retryGpsBtn.style.display = 'none';
+            }, function(err) {
+                alert('Unable to fetch your location. Please enable GPS and try again.');
+                confirmBtn.disabled = true;
+                retryGpsBtn.style.display = 'inline-block';
+                // Place a default marker in India
+                if (!marker) {
+                    marker = L.marker([20.5937, 78.9629], { draggable: true }).addTo(map);
+                    marker.bindPopup("Move me to your location").openPopup();
+                }
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+        } else {
+            alert('Geolocation is not supported by your browser.');
+            confirmBtn.disabled = true;
+        }
+    }
+
+    modal.addEventListener('shown.bs.modal', function () {
+        if (!map) {
+            map = L.map('map').setView([20.5937, 78.9629], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+        }
+        setTimeout(function() { map.invalidateSize(); }, 100);
+        // Force GPS request when modal opens
+        requestGPS();
+    });
+
+    retryGpsBtn.addEventListener('click', function() {
+        requestGPS();
+    });
+
+    // Confirm location
+    confirmBtn.addEventListener('click', function() {
+        if (!marker) {
+            alert('Please wait for the map to load.');
+            return;
+        }
+        const pos = marker.getLatLng();
+        if (!confirm('Confirm this location as your business address? This cannot be changed later.')) return;
+
+        fetch('/employer/update-location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ latitude: pos.lat, longitude: pos.lng })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Location saved successfully!');
+                // Set hidden field to indicate location is confirmed
+                locationConfirmedInput.value = '1';
+                const modalObj = bootstrap.Modal.getInstance(modal);
+                modalObj.hide();
+                // Update the UI to show location saved without full reload
+                document.getElementById('open-location-btn').style.display = 'none';
+                document.querySelector('.form-label-custom + .d-flex').innerHTML = '<span class="text-success small ms-2"><i class="fas fa-check-circle"></i> Location saved</span>';
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(err => alert('Network error: ' + err));
     });
 });
 </script>
