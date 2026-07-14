@@ -399,12 +399,86 @@ def hire_dashboard():
         flash('Please complete your business profile first.', 'warning')
         return redirect(url_for('employer_profile'))
 
-    # Check if employer is verified
     if not employer_profile.verified:
         return redirect(url_for('verification_pending'))
 
-    profiles = JobSeekerProfile.query.filter_by(verified=True).all()
-    return render_template('hire_dashboard.html', profiles=profiles)
+    # ---- Filter parameters ----
+    use_pincode = request.args.get('use_pincode')  # checkbox: "1" if checked
+    pincode_value = employer_profile.pincode if employer_profile else ''
+    pincode_filter = request.args.get('pincode', '').strip()  # manual pincode input
+    city_filter = request.args.get('city', '').strip()
+    state_filter = request.args.get('state', '').strip()
+    education_filter = request.args.get('education', '').strip()
+    skills_keyword = request.args.get('skills', '').strip()
+    search = request.args.get('search', '').strip()
+
+    # Base query: verified profiles only
+    query = JobSeekerProfile.query.filter_by(verified=True)
+
+    # Pincode – if checkbox is checked, use employer’s pincode; otherwise use manual input
+    if use_pincode and pincode_value:
+        query = query.filter(JobSeekerProfile.pincode == pincode_value)
+    elif pincode_filter:
+        query = query.filter(JobSeekerProfile.pincode == pincode_filter)
+
+    # City – exact match (you can change to ilike if desired)
+    if city_filter:
+        query = query.filter(JobSeekerProfile.city == city_filter)
+
+    # State – case-insensitive partial match
+    if state_filter:
+        query = query.filter(JobSeekerProfile.state.ilike(f'%{state_filter}%'))
+
+    # Education level – dropdown
+    if education_filter:
+        query = query.filter(JobSeekerProfile.education_level == education_filter)
+
+    # Skills – search in skills text
+    if skills_keyword:
+        query = query.filter(JobSeekerProfile.skills.ilike(f'%{skills_keyword}%'))
+
+    # General search – looks in first name, last name, skills, education_other, preferred locations
+    if search:
+        pattern = f'%{search}%'
+        query = query.filter(
+            JobSeekerProfile.first_name.ilike(pattern) |
+            JobSeekerProfile.last_name.ilike(pattern) |
+            JobSeekerProfile.skills.ilike(pattern) |
+            JobSeekerProfile.education_other.ilike(pattern) |
+            JobSeekerProfile.preferred_location1.ilike(pattern) |
+            JobSeekerProfile.preferred_location2.ilike(pattern) |
+            JobSeekerProfile.preferred_location3.ilike(pattern)
+        )
+
+    profiles = query.all()
+
+    # Collect distinct values for filter dropdowns
+    all_cities = sorted([
+        c[0] for c in db.session.query(JobSeekerProfile.city)
+        .filter(JobSeekerProfile.verified == True)
+        .distinct().all()
+    ])
+    all_education_levels = sorted([
+        e[0] for e in db.session.query(JobSeekerProfile.education_level)
+        .filter(JobSeekerProfile.verified == True)
+        .distinct().all()
+    ])
+
+    return render_template(
+        'hire_dashboard.html',
+        profiles=profiles,
+        all_cities=all_cities,
+        all_education_levels=all_education_levels,
+        # Pass filter values back to template to keep form state
+        use_pincode=use_pincode,
+        pincode_filter=pincode_filter,
+        employer_pincode=pincode_value,
+        city_filter=city_filter,
+        state_filter=state_filter,
+        education_filter=education_filter,
+        skills_keyword=skills_keyword,
+        search=search
+    )
 
 
 @app.route('/verification-pending')

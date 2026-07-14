@@ -6,6 +6,78 @@
         <span class="text-secondary"><i class="fas fa-users me-2"></i>{{ profiles|length }} profile(s)</span>
     </div>
 
+    <!-- ===== FILTER PANEL ===== -->
+    <div class="card-modern p-3 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0 text-primary-light"><i class="fas fa-filter me-2"></i>Filters</h6>
+            {% if use_pincode or pincode_filter or city_filter or state_filter or education_filter or skills_keyword or search %}
+                <a href="{{ url_for('hire_dashboard') }}" class="btn btn-sm btn-outline-light">
+                    <i class="fas fa-redo me-1"></i> Clear All
+                </a>
+            {% endif %}
+        </div>
+        <form method="GET" action="{{ url_for('hire_dashboard') }}" class="row g-2">
+            <!-- Pincode -->
+            <div class="col-auto">
+                <div class="form-check form-check-dark mt-2">
+                    <input class="form-check-input" type="checkbox" name="use_pincode" value="1" id="use_pincode"
+                           {% if use_pincode %}checked{% endif %}>
+                    <label class="form-check-label" for="use_pincode">My Pincode: {{ employer_pincode }}</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label-custom small">Or Pincode</label>
+                <input type="text" class="form-control-dark" name="pincode" placeholder="e.g. 110001"
+                       value="{{ pincode_filter }}">
+            </div>
+            <!-- City dropdown -->
+            <div class="col-md-2">
+                <label class="form-label-custom small">City</label>
+                <select class="form-select-dark" name="city">
+                    <option value="">All Cities</option>
+                    {% for c in all_cities %}
+                        <option value="{{ c }}" {% if city_filter == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- State text -->
+            <div class="col-md-2">
+                <label class="form-label-custom small">State</label>
+                <input type="text" class="form-control-dark" name="state" placeholder="e.g. Maharashtra"
+                       value="{{ state_filter }}">
+            </div>
+            <!-- Education level dropdown -->
+            <div class="col-md-2">
+                <label class="form-label-custom small">Education</label>
+                <select class="form-select-dark" name="education">
+                    <option value="">All Levels</option>
+                    {% for lvl in all_education_levels %}
+                        <option value="{{ lvl }}" {% if education_filter == lvl %}selected{% endif %}>{{ lvl }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Skills keyword -->
+            <div class="col-md-2">
+                <label class="form-label-custom small">Skills</label>
+                <input type="text" class="form-control-dark" name="skills" placeholder="e.g. welding, driving"
+                       value="{{ skills_keyword }}">
+            </div>
+            <!-- General search -->
+            <div class="col-md-3">
+                <label class="form-label-custom small">Search</label>
+                <input type="text" class="form-control-dark" name="search" placeholder="Name, skills, location..."
+                       value="{{ search }}">
+            </div>
+            <!-- Submit -->
+            <div class="col-auto d-flex align-items-end">
+                <button type="submit" class="btn btn-primary-gradient btn-sm">
+                    <i class="fas fa-check me-1"></i> Apply
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ===== PROFILE CARDS (unchanged) ===== -->
     <div class="row">
         {% for p in profiles %}
         <div class="col-md-6 col-lg-4 mb-4">
@@ -55,7 +127,7 @@
         {% else %}
         <div class="col-12">
             <div class="alert-modern alert-info text-center py-4">
-                <i class="fas fa-info-circle me-2"></i> No jobseeker profiles yet. Check back later.
+                <i class="fas fa-info-circle me-2"></i> No jobseeker profiles match your filters.
             </div>
         </div>
         {% endfor %}
@@ -72,5 +144,32 @@
     .card-modern .fa-graduation-cap { color: var(--primary-light) !important; }
     .card-modern .fa-map-marker-alt { color: var(--employer-light) !important; }
     .card-modern .fa-tools { color: var(--accent-gold) !important; }
+    /* Dark form styles (same as job_list page) */
+    .btn-outline-light { border: 1px solid rgba(255,255,255,0.3); color: #CBD5E1; background: transparent; }
+    .btn-outline-light:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .form-label-custom.small { font-size: 0.8rem; color: #94A3B8; margin-bottom: 2px; }
+    .form-select-dark, .form-control-dark {
+        background: rgba(15,15,30,0.6);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        color: #F1F5F9;
+        padding: 8px 10px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    .form-select-dark:focus, .form-control-dark:focus {
+        background: rgba(20,20,45,0.8);
+        border-color: var(--primary);
+        box-shadow: 0 0 12px rgba(168,85,247,0.25);
+    }
+    .form-check-dark .form-check-input {
+        background-color: rgba(15,15,30,0.8);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .form-check-dark .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+    .form-check-dark .form-check-label { color: #CBD5E1; font-size: 0.85rem; }
 </style>
 {% endblock %}
