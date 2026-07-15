@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>View Employer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 300px; width: 100%; border-radius: 8px; margin-top: 10px; }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-dark bg-dark">
@@ -30,6 +35,17 @@
         <p><strong>State:</strong> {{ profile.state }}</p>
         <p><strong>Pincode:</strong> {{ profile.pincode }}</p>
         <p><strong>Date of Birth:</strong> {{ profile.dob }}</p>
+
+        <!-- Coordinates & Map -->
+        <hr>
+        <h5>Business Location</h5>
+        {% if profile.latitude is not none and profile.longitude is not none %}
+            <p><strong>Latitude:</strong> {{ profile.latitude }} | <strong>Longitude:</strong> {{ profile.longitude }}</p>
+            <div id="map"></div>
+        {% else %}
+            <p class="text-muted">No map coordinates saved for this business.</p>
+        {% endif %}
+
         <p><strong>Status:</strong> 
             {% if profile.verified %}
                 <span class="badge bg-success">Approved</span>
@@ -40,5 +56,21 @@
         </p>
         <p><strong>Registered:</strong> {{ profile.created_at.strftime('%Y-%m-%d') }}</p>
     </div>
+
+    <!-- Leaflet JS & map initialization -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    {% if profile.latitude is not none and profile.longitude is not none %}
+    <script>
+        const lat = {{ profile.latitude }};
+        const lng = {{ profile.longitude }};
+        const map = L.map('map').setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup('<b>{{ profile.business_name }}</b><br>{{ profile.business_address }}')
+            .openPopup();
+    </script>
+    {% endif %}
 </body>
 </html>

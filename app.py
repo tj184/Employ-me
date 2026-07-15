@@ -76,10 +76,19 @@ def login():
         if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user)
             flash('Login successful!', 'success')
+
             next_page = request.args.get('next')
             if not next_page:
-                next_page = url_for('jobseeker_dashboard') if user.role == 'jobseeker' else url_for('employer_profile')
+                # No specific page requested – decide based on profile existence
+                if user.role == 'jobseeker':
+                    profile_exists = JobSeekerProfile.query.filter_by(user_id=user.id).first() is not None
+                    next_page = url_for('index') if profile_exists else url_for('jobseeker_dashboard')
+                else:
+                    profile_exists = EmployerProfile.query.filter_by(user_id=user.id).first() is not None
+                    next_page = url_for('index') if profile_exists else url_for('employer_profile')
+
             return redirect(next_page)
+
         flash('Invalid email or password.', 'danger')
     return render_template('login.html', form=form)
 
