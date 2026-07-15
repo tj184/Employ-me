@@ -149,7 +149,25 @@ def signup():
         if session.get('email_verified') == request.form.get('email'):
             email_preverified = True
 
-    return render_template('signup.html', form=form, email_preverified=email_preverified)
+    privacy_policy_text = ""
+    try:
+        with open('policies/privacy_policy.html', 'r', encoding='utf-8') as f:
+            privacy_policy_text = f.read()
+    except FileNotFoundError:
+        privacy_policy_text = "<p>Privacy policy file not found.</p>"
+
+    terms_and_conditions_text = ""
+    try:
+        with open('policies/terms_and_conditions.html', 'r', encoding='utf-8') as f:
+            terms_and_conditions_text = f.read()
+    except FileNotFoundError:
+        terms_and_conditions_text = "<p>Terms and Conditions file not found.</p>"
+
+    return render_template('signup.html', form=form,
+                           email_preverified=email_preverified,
+                           privacy_policy_text=privacy_policy_text,
+                           terms_and_conditions_text=terms_and_conditions_text)
+
 @app.route('/logout')
 @login_required
 def logout():
