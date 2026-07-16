@@ -888,6 +888,25 @@
                             <i class="fas fa-envelope me-1"></i> Contact Us
                         </a>
                     </li>
+                    <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-language"></i> Language
+    </a>
+    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="langDropdown">
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('en')">English (Original)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('hi')">हिन्दी (Hindi)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('bn')">বাংলা (Bengali)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('te')">తెలుగు (Telugu)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('mr')">मराठी (Marathi)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('ta')">தமிழ் (Tamil)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('ur')">اردو (Urdu)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('gu')">ગુજરાતી (Gujarati)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('kn')">ಕನ್ನಡ (Kannada)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('ml')">മലയാളം (Malayalam)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('or')">ଓଡ଼ିଆ (Odia)</a></li>
+        <li><a class="dropdown-item" href="javascript:void(0);" onclick="changeLanguage('pa')">ਪੰਜਾਬੀ (Punjabi)</a></li>
+    </ul>
+</li>
 
 
                     {% if current_user.is_authenticated %}
@@ -918,6 +937,7 @@
                 </ul>
             </div>
         </div>
+        
     </nav>
 
     <main>
@@ -1050,5 +1070,33 @@
         });
     </script>
     {% block extra_scripts %}{% endblock %}
+
+    <!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: 'hi,bn,te,mr,ta,ur,gu,kn,ml,or,pa,as,sa,sd,ne,ks,doi,brx,mai,sat',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+function changeLanguage(lang) {
+    // Find the Google Translate select element
+    var select = document.querySelector('#google_translate_element select');
+    if (select) {
+        // Set the value and trigger change event
+        select.value = lang;
+        select.dispatchEvent(new Event('change'));
+    } else {
+        // If the widget hasn't loaded yet, reload with the language parameter
+        window.location = 'https://translate.google.com/translate?hl=' + lang + '&sl=en&u=' + encodeURIComponent(window.location.href);
+    }
+}
+</script>
 </body>
 </html>
