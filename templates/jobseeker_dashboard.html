@@ -65,8 +65,9 @@
                         {% if 'dob' in locked_fields %}
                             <input class="form-control-dark" type="date" value="{{ form.dob.data.strftime('%Y-%m-%d') if form.dob.data else '' }}" readonly>
                         {% else %}
-                            {{ form.dob(class="form-control-dark", type="date") }}
+                            {{ form.dob(class="form-control-dark", type="date", id="dob") }}
                         {% endif %}
+                        <div class="text-danger small mt-1" id="age-error" style="display:none;">You must be at least 18 years old</div>
                         {% for err in form.dob.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6">
@@ -100,8 +101,9 @@
                         {% if 'pincode' in locked_fields %}
                             <input class="form-control-dark" value="{{ form.pincode.data or '' }}" readonly>
                         {% else %}
-                            {{ form.pincode(class="form-control-dark") }}
+                            {{ form.pincode(class="form-control-dark", id="pincode") }}
                         {% endif %}
+                        <div class="text-danger small mt-1" id="pincode-error" style="display:none;">Pincode must be 6 digits</div>
                         {% for err in form.pincode.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                     <div class="col-md-6">
@@ -111,8 +113,9 @@
                         {% if 'mobile' in locked_fields %}
                             <input class="form-control-dark" value="{{ form.mobile.data or '' }}" readonly>
                         {% else %}
-                            {{ form.mobile(class="form-control-dark") }}
+                            {{ form.mobile(class="form-control-dark", id="mobile") }}
                         {% endif %}
+                        <div class="text-danger small mt-1" id="mobile-error" style="display:none;">Enter a valid 10-digit mobile number starting with 6-9</div>
                         {% for err in form.mobile.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
                     </div>
                 </div>
@@ -285,9 +288,84 @@ document.addEventListener('DOMContentLoaded', function() {
     eduSelect.addEventListener('change', toggleOther);
     toggleOther();
 
-    // Confirmation on submit (works with Enter key too)
+    // ---- Validation Helpers ----
+    function isValidAge(dobString) {
+        if (!dobString) return false;
+        const dob = new Date(dobString);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+            age--;
+        }
+        return age >= 18;
+    }
+
+    function isValidMobile(mobile) {
+        return /^[6-9]\d{9}$/.test(mobile);
+    }
+
+    function isValidPincode(pincode) {
+        return /^\d{6}$/.test(pincode);
+    }
+
+    // DOM references
     const form = document.getElementById('profile-form');
+    const dobField = document.getElementById('dob');
+    const mobileField = document.getElementById('mobile');
+    const pincodeField = document.getElementById('pincode');
+    const ageError = document.getElementById('age-error');
+    const mobileError = document.getElementById('mobile-error');
+    const pincodeError = document.getElementById('pincode-error');
+
+    // Clear errors when user types
+    if (dobField) dobField.addEventListener('input', () => { ageError.style.display = 'none'; });
+    if (mobileField) mobileField.addEventListener('input', () => { mobileError.style.display = 'none'; });
+    if (pincodeField) pincodeField.addEventListener('input', () => { pincodeError.style.display = 'none'; });
+
+    // Form submission handler
     form.addEventListener('submit', function(e) {
+        let valid = true;
+
+        // Age validation (only if editable)
+        if (dobField && !dobField.readOnly) {
+            const dobVal = dobField.value;
+            if (dobVal && !isValidAge(dobVal)) {
+                ageError.style.display = 'block';
+                valid = false;
+            } else {
+                ageError.style.display = 'none';
+            }
+        }
+
+        // Mobile validation (only if editable)
+        if (mobileField && !mobileField.readOnly) {
+            const mobileVal = mobileField.value.trim();
+            if (mobileVal && !isValidMobile(mobileVal)) {
+                mobileError.style.display = 'block';
+                valid = false;
+            } else {
+                mobileError.style.display = 'none';
+            }
+        }
+
+        // Pincode validation (only if editable)
+        if (pincodeField && !pincodeField.readOnly) {
+            const pincodeVal = pincodeField.value.trim();
+            if (pincodeVal && !isValidPincode(pincodeVal)) {
+                pincodeError.style.display = 'block';
+                valid = false;
+            } else {
+                pincodeError.style.display = 'none';
+            }
+        }
+
+        if (!valid) {
+            e.preventDefault();
+            return false;
+        }
+
+        // If all valid, show confirmation dialog
         if (!confirm('Are you sure you want to save your profile? Critical fields will be locked after saving.')) {
             e.preventDefault();
             return false;
