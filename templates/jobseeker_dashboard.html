@@ -227,21 +227,6 @@
                             <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" class="img-thumbnail-modern mt-2" width="150">
                         {% endif %}
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label-custom">
-                            {{ form.aadhar_card.label.text }}
-                            {% if 'aadhar_card' not in locked_fields %}<span class="text-danger">*</span>{% endif %}
-                        </label>
-                        {% if 'aadhar_card' in locked_fields %}
-                            {% if profile and profile.aadhar_card %}
-                                <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" class="img-thumbnail-modern d-block" width="150">
-                            {% else %}
-                                <p class="text-muted">No Aadhaar card uploaded.</p>
-                            {% endif %}
-                        {% else %}
-                            {{ form.aadhar_card(class="form-control-dark") }}
-                        {% endif %}
-                    </div>
                 </div>
 
                 <div class="mt-4">

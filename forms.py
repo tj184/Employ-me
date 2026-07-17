@@ -203,7 +203,7 @@ class ProfileForm(FlaskForm):
 
     # Images
     profile_pic = FileField('Profile Picture', validators=[FileAllowed(['jpg','png','jpeg'], 'Images only!')])
-    aadhar_card = FileField('Aadhaar Card (not shared with employers)', validators=[FileAllowed(['jpg','png','jpeg'], 'Images only!')])
+    
 
     submit = SubmitField('Save Profile')
 
@@ -226,7 +226,7 @@ class EmployerForm(FlaskForm):
     city = StringField('City', validators=[DataRequired(), Length(max=100)])
     state = StringField('State', validators=[DataRequired(), Length(max=100)])
     pincode = StringField('Pincode', validators=[DataRequired(), validate_pincode])
-    profile_pic = FileField('Business Profile Picture (optional)', validators=[FileAllowed(['jpg','png','jpeg'], 'Images only!')])
+    profile_pic = FileField('Business Profile Picture ', validators=[FileAllowed(['jpg','png','jpeg'], 'Images only!')])
 
     submit = SubmitField('Save Business Profile')
 

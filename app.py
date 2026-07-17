@@ -184,8 +184,8 @@ def jobseeker_dashboard():
 
     locked_fields = [
         'first_name', 'last_name', 'middle_name', 'dob', 'gender', 'address',
-        'pincode', 'mobile', 'father_husband_name', 'city', 'state', 'aadhar_card'
-    ] if profile else []
+        'pincode', 'mobile', 'father_husband_name', 'city', 'state'
+    ] if (profile and profile.verified) else []
 
     if profile:
         for field_name in locked_fields:
@@ -200,12 +200,37 @@ def jobseeker_dashboard():
                 return render_template('jobseeker_dashboard.html',
                                        form=form, profile=profile,
                                        cities=INDIAN_CITIES, locked_fields=locked_fields)
-            if not form.aadhar_card.data:
-                flash('Aadhaar card image is required.', 'danger')
-                return render_template('jobseeker_dashboard.html',
-                                       form=form, profile=profile,
-                                       cities=INDIAN_CITIES, locked_fields=locked_fields)
 
+        # --- Create profile if not exists ---
+        if not profile:
+            profile = JobSeekerProfile(user_id=current_user.id)
+            db.session.add(profile)
+
+        # --- Update personal fields only if not locked ---
+        if 'first_name' not in locked_fields:
+            profile.first_name = form.first_name.data
+        if 'middle_name' not in locked_fields:
+            profile.middle_name = form.middle_name.data
+        if 'last_name' not in locked_fields:
+            profile.last_name = form.last_name.data
+        if 'dob' not in locked_fields:
+            profile.dob = form.dob.data
+        if 'gender' not in locked_fields:
+            profile.gender = form.gender.data
+        if 'address' not in locked_fields:
+            profile.address = form.address.data
+        if 'pincode' not in locked_fields:
+            profile.pincode = form.pincode.data
+        if 'mobile' not in locked_fields:
+            profile.mobile = form.mobile.data
+        if 'father_husband_name' not in locked_fields:
+            profile.father_husband_name = form.father_husband_name.data
+        if 'city' not in locked_fields:
+            profile.city = form.city.data
+        if 'state' not in locked_fields:
+            profile.state = form.state.data
+
+        # --- Skills (always editable) ---
         selected = form.selected_skills.data
         skills_list = []
         if selected:
@@ -219,22 +244,7 @@ def jobseeker_dashboard():
                                    form=form, profile=profile,
                                    cities=INDIAN_CITIES, locked_fields=locked_fields)
 
-        if not profile:
-            profile = JobSeekerProfile(user_id=current_user.id)
-            db.session.add(profile)
-
-            profile.first_name = form.first_name.data
-            profile.middle_name = form.middle_name.data
-            profile.last_name = form.last_name.data
-            profile.dob = form.dob.data
-            profile.gender = form.gender.data
-            profile.address = form.address.data
-            profile.pincode = form.pincode.data
-            profile.mobile = form.mobile.data
-            profile.father_husband_name = form.father_husband_name.data
-            profile.city = form.city.data
-            profile.state = form.state.data
-
+        # --- Always editable fields ---
         profile.education_level = form.education_level.data
         profile.education_other = form.education_other.data if form.education_level.data == 'Others' else None
         profile.preferred_location1 = form.preferred_location1.data
@@ -250,12 +260,6 @@ def jobseeker_dashboard():
                 if old and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], old)):
                     os.remove(os.path.join(app.config['UPLOAD_FOLDER'], old))
                 profile.profile_pic = filename
-
-        if not profile.id:
-            if form.aadhar_card.data:
-                filename = save_image(form.aadhar_card.data)
-                if filename:
-                    profile.aadhar_card = filename
 
         db.session.commit()
         flash('Profile saved successfully!', 'success')
@@ -315,9 +319,9 @@ def employer_profile():
     locked_fields = [
         'business_name', 'business_address', 'gst_number', 'business_type',
         'city', 'state', 'pincode'
-    ] if profile and profile.business_name else []
+    ] if (profile and profile.verified and not is_new) else []
 
-    if profile and not is_new:
+    if profile and profile.verified and not is_new:
         for field_name in locked_fields:
             field = getattr(form, field_name, None)
             if field:
@@ -328,36 +332,38 @@ def employer_profile():
         if is_new and not form.profile_pic.data:
             flash('Business profile picture is required.', 'danger')
             return render_template('employer_profile.html',
-                                   form=form,
-                                   profile=profile,
+                                   form=form, profile=profile,
                                    locked_fields=locked_fields)
 
         # ---- Location mandatory for new profiles ----
         if is_new:
-            # Check if location has been set (either via map before this form,
-            # or via the hidden field `location_confirmed` in the submitted form)
             location_ok = (profile and profile.latitude is not None) or \
                           request.form.get('location_confirmed') == '1'
             if not location_ok:
                 flash('Please set your business location on the map before saving.', 'danger')
                 return render_template('employer_profile.html',
-                                       form=form,
-                                       profile=profile,
+                                       form=form, profile=profile,
                                        locked_fields=locked_fields)
 
-        # ---- Create or update profile ----
-        if is_new and not profile:
+        # ---- Create profile if not exists ----
+        if not profile:
             profile = EmployerProfile(user_id=current_user.id)
             db.session.add(profile)
 
-        # Update fields (for new or editing)
-        if is_new:
+        # ---- Update fields only if not locked ----
+        if 'business_name' not in locked_fields:
             profile.business_name = form.business_name.data
+        if 'business_address' not in locked_fields:
             profile.business_address = form.business_address.data
+        if 'gst_number' not in locked_fields:
             profile.gst_number = form.gst_number.data
+        if 'business_type' not in locked_fields:
             profile.business_type = form.business_type.data
+        if 'city' not in locked_fields:
             profile.city = form.city.data
+        if 'state' not in locked_fields:
             profile.state = form.state.data
+        if 'pincode' not in locked_fields:
             profile.pincode = form.pincode.data
 
         # Always editable fields

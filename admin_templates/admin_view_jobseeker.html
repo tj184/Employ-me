@@ -29,16 +29,25 @@
             <p><strong>Profile Picture:</strong><br>
             <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" style="max-width: 200px;"></p>
         {% endif %}
-        {% if profile.aadhar_card %}
-            <p><strong>Aadhaar Card:</strong><br>
-            <img src="{{ url_for('static', filename='uploads/' + profile.aadhar_card) }}" style="max-width: 200px;"></p>
-        {% endif %}
+        <!-- Aadhaar card removed completely -->
+
         <p><strong>Status:</strong> 
             {% if profile.verified %}
                 <span class="badge bg-success">Approved</span>
             {% else %}
-                <span class="badge bg-warning">Pending</span>
-                <a href="{{ url_for('admin_approve_jobseeker', profile_id=profile.id) }}" class="btn btn-success btn-sm">Approve Now</a>
+                {% if profile.admin_feedback %}
+                    <span class="badge bg-danger">Rejected</span>
+                    <br><strong>Feedback:</strong> {{ profile.admin_feedback }}
+                {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                {% endif %}
+                <div class="mt-2">
+                    <a href="{{ url_for('admin_approve_jobseeker', profile_id=profile.id) }}" class="btn btn-success btn-sm">Approve</a>
+                    <form method="POST" action="{{ url_for('admin_reject_jobseeker', profile_id=profile.id) }}" style="display:inline;">
+                        <textarea name="feedback" class="form-control mb-1" placeholder="Reason for rejection (optional)" rows="2"></textarea>
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                </div>
             {% endif %}
         </p>
     </div>

@@ -61,7 +61,7 @@ def admin_dashboard():
                            pending_employers=pending_employers,
                            approved_employers=approved_employers)
 
-# ---- Jobseeker routes (existing) ----
+# ---- Jobseeker routes ----
 @admin_app.route('/view/jobseeker/<int:profile_id>')
 @login_required_admin
 def admin_view_jobseeker(profile_id):
@@ -73,11 +73,23 @@ def admin_view_jobseeker(profile_id):
 def admin_approve_jobseeker(profile_id):
     profile = JobSeekerProfile.query.get_or_404(profile_id)
     profile.verified = True
+    profile.admin_feedback = None   # clear any previous rejection feedback
     db.session.commit()
     flash(f'Jobseeker {profile.first_name} {profile.last_name} has been approved.', 'success')
     return redirect(url_for('admin_dashboard'))
 
-# ---- Employer routes (new) ----
+@admin_app.route('/reject/jobseeker/<int:profile_id>', methods=['POST'])
+@login_required_admin
+def admin_reject_jobseeker(profile_id):
+    profile = JobSeekerProfile.query.get_or_404(profile_id)
+    feedback = request.form.get('feedback', '').strip()
+    profile.verified = False
+    profile.admin_feedback = feedback if feedback else None
+    db.session.commit()
+    flash(f'Jobseeker {profile.first_name} {profile.last_name} has been rejected.', 'warning')
+    return redirect(url_for('admin_dashboard'))
+
+# ---- Employer routes ----
 @admin_app.route('/view/employer/<int:profile_id>')
 @login_required_admin
 def admin_view_employer(profile_id):
@@ -89,6 +101,18 @@ def admin_view_employer(profile_id):
 def admin_approve_employer(profile_id):
     profile = EmployerProfile.query.get_or_404(profile_id)
     profile.verified = True
+    profile.admin_feedback = None
     db.session.commit()
     flash(f'Employer {profile.business_name} has been approved.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@admin_app.route('/reject/employer/<int:profile_id>', methods=['POST'])
+@login_required_admin
+def admin_reject_employer(profile_id):
+    profile = EmployerProfile.query.get_or_404(profile_id)
+    feedback = request.form.get('feedback', '').strip()
+    profile.verified = False
+    profile.admin_feedback = feedback if feedback else None
+    db.session.commit()
+    flash(f'Employer {profile.business_name} has been rejected.', 'warning')
     return redirect(url_for('admin_dashboard'))

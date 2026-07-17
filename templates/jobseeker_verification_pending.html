@@ -8,6 +8,14 @@
             <h2 style="font-family: var(--font-display); font-weight: 800; color: #F8FAFC;">
                 Verification Pending
             </h2>
+            {% if current_user.profile and current_user.profile.admin_feedback %}
+                <div class="alert alert-danger alert-modern mx-auto mb-4" style="max-width: 100%; text-align: left;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Your profile was rejected.</strong>
+                    <p class="mb-0 mt-1">Reason: {{ current_user.profile.admin_feedback }}</p>
+                    <p class="mb-0 mt-1">Please update your profile and resubmit, or contact support.</p>
+                </div>
+            {% endif %}
             <p class="lead mt-3 text-secondary">
                 Your profile is currently under review by our admin team.
             </p>

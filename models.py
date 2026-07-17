@@ -53,13 +53,13 @@ class JobSeekerProfile(db.Model):
 
     # Images
     profile_pic = db.Column(db.String(200))
-    aadhar_card = db.Column(db.String(200))
 
     # Payment status (default 'failed' until payment is completed)
     payment_status = db.Column(db.String(20), default='failed', nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     verified = db.Column(db.Boolean, default=False, nullable=False)
+    admin_feedback = db.Column(db.Text, nullable=True)
 
 
 class EmployerProfile(db.Model):
@@ -83,6 +83,7 @@ class EmployerProfile(db.Model):
 
     # Verified by admin (employer cannot change this)
     verified = db.Column(db.Boolean, default=False, nullable=False)
+    admin_feedback = db.Column(db.Text, nullable=True) 
     # Images
     profile_pic = db.Column(db.String(200))   # business profile picture
 
